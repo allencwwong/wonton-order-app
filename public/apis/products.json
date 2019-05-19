@@ -1,0 +1,30 @@
+{
+    "dce" : {
+      "name":{
+        "en": "Chive Dumpling",
+        "cn": "韭菜餃"
+      },
+      "price": 14.5
+    },
+    "dhk" : {
+      "name":{
+        "en": "HK Dumpling",
+        "cn": "港式水餃"
+      },
+      "price" : 16.5
+    },
+    "ps" : {
+      "name":{
+        "en": "Potstickers",
+        "cn": "鍋貼"
+      },
+      "price" : 14.5
+    },
+    "wt" : {
+      "name":{
+        "en": "Wonton",
+        "cn": "餛飩"
+      },
+      "Wonton" : 13.5
+    }
+}
