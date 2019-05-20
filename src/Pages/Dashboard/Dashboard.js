@@ -14,8 +14,11 @@ export class Dashboard extends Component {
                 </Container>
                 <Container>
                     <Row>
-                        <Col>
+                        <Col xs={6} sm={3}>
                             <h1>Dashboard</h1>
+                        </Col>
+                        <Col xs={6} sm={9}>
+                            <div className="btn btn-primary">Add</div>
                         </Col>
                     </Row>
                     <OrderList />

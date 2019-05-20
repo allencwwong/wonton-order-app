@@ -20,10 +20,19 @@ export class OrderList extends Component {
                 orderList = [];
 
             orderIds.forEach((id) => {
-                orderList.push(<OrderDetails order={orders[id]} />);
+                orderList.push(
+                    <Row>
+                        <Col sm={12} md={3}>
+                            <OrderInfo />
+                        </Col>
+                        <Col sm={12} md={8}>
+                            <OrderDetails order={orders[id]} />
+                        </Col>
+                    </Row>,
+                );
             });
 
-            // pass createOrderList is loaded
+            // pass createOrderDetails is loaded
             this.setState({
                 isOrderLoaded: true,
                 orderList: orderList,
@@ -34,15 +43,14 @@ export class OrderList extends Component {
     render() {
         if (this.state.isOrderLoaded) {
             return (
-                <Row>
-                    <Col sm={12}>
-                        <h1>OrderList</h1>
-                    </Col>
-                    <Col sm={3}>
-                        <OrderInfo />
-                    </Col>
-                    <Col sm={9}>{this.state.orderList}</Col>
-                </Row>
+                <div>
+                    <Row>
+                        <Col sm={12}>
+                            <h1>OrderList</h1>
+                        </Col>
+                    </Row>
+                    {this.state.orderList}
+                </div>
             );
         } else {
             return <div>Loading...</div>;

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { database } from './../../firebase';
-import { Row, Col } from './../../_styles';
+import { Row, Col, Table } from './../../_styles';
 
 export class OrderDetails extends Component {
     constructor(props) {
@@ -18,15 +18,21 @@ export class OrderDetails extends Component {
                 orderItemIds = Object.keys(order),
                 orderItems = [];
 
-            orderItemIds.forEach((id) => {
+            orderItemIds.forEach((id, idx, arr) => {
                 let name = products[id].name.cn,
                     price = products[id].price;
+
                 orderItems.push(
-                    <Col sm={12}>
-                        name:{name} price:{price}
-                    </Col>,
+                    <tr>
+                        <td>{name}</td>
+                        <td>{price}</td>
+                        <td>{order[id].qty}</td>
+                        <td>{order[id].total}</td>
+                    </tr>,
                 );
             });
+
+            // orderItems.push(</Table>);
 
             console.log(products);
             this.setState({
@@ -40,7 +46,17 @@ export class OrderDetails extends Component {
         const { order } = this.props.order;
         console.log(this.props);
         if (this.state.isProductLoaded) {
-            return <Row>{this.state.orderItems}</Row>;
+            return (
+                <Table hover size="sm">
+                    <tbody>
+                        <td>Name</td>
+                        <td>Price</td>
+                        <td>Qty</td>
+                        <td>Total</td>
+                    </tbody>
+                    {this.state.orderItems}
+                </Table>
+            );
         } else {
             return <div>Loading info...</div>;
         }
