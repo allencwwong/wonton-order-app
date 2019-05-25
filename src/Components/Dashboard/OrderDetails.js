@@ -23,7 +23,7 @@ export class OrderDetails extends Component {
                     price = products[id].price;
 
                 orderItems.push(
-                    <tr>
+                    <tr key={idx}>
                         <td>{name}</td>
                         <td>{price}</td>
                         <td>{order[id].qty}</td>
@@ -32,9 +32,6 @@ export class OrderDetails extends Component {
                 );
             });
 
-            // orderItems.push(</Table>);
-
-            console.log(products);
             this.setState({
                 isProductLoaded: true,
                 orderItems: orderItems,
@@ -47,14 +44,16 @@ export class OrderDetails extends Component {
         console.log(this.props);
         if (this.state.isProductLoaded) {
             return (
-                <Table hover size="sm">
+                <Table className="order-details" responsive hover size="sm">
                     <tbody>
-                        <td>Name</td>
-                        <td>Price</td>
-                        <td>Qty</td>
-                        <td>Total</td>
+                        <tr>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Qty</th>
+                            <th>Total</th>
+                        </tr>
+                        {this.state.orderItems}
                     </tbody>
-                    {this.state.orderItems}
                 </Table>
             );
         } else {

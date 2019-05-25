@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { database } from './../../firebase';
 import { OrderInfo, OrderDetails } from './';
-import { Row, Col } from './../../_styles';
+import { Row, Col, Badge } from './../../_styles';
 
 export class OrderList extends Component {
     constructor(props) {
@@ -12,6 +12,33 @@ export class OrderList extends Component {
         };
     }
 
+    createOrderList = (orderList) => {
+        let orderListRender = [];
+        orderList.forEach((order, idx, arr) => {
+            if (order.status === 'active') {
+                if (idx === 0) {
+                    orderListRender.push(
+                        <h2>
+                            Active Orders
+                            <span>
+                                <Badge pill variant="primary">
+                                    {arr.length}
+                                </Badge>
+                            </span>
+                        </h2>,
+                    );
+                }
+                orderListRender.push(order.render);
+            } else {
+                if (idx === arr.length - 1) {
+                    orderListRender.push(<h1>Completed Orders</h1>);
+                }
+                orderListRender.push(order.render);
+            }
+        });
+        return orderListRender;
+    };
+
     componentDidMount() {
         console.log(this.ordersRef);
         this.ordersRef.on('value', (snapshot) => {
@@ -19,9 +46,15 @@ export class OrderList extends Component {
                 orderIds = Object.keys(orders),
                 orderList = [];
 
-            orderIds.forEach((id) => {
-                orderList.push(
-                    <Row>
+            orderIds.forEach((id, idx) => {
+                let orderItem = {};
+                // set order item render
+                orderItem.render = [];
+                // set order item status to sort in dashboard
+                orderItem.status = orders[id].status;
+                // create order item render
+                orderItem.render.push(
+                    <Row key={idx}>
                         <Col sm={12} md={3}>
                             <OrderInfo />
                         </Col>
@@ -30,6 +63,8 @@ export class OrderList extends Component {
                         </Col>
                     </Row>,
                 );
+                // set order item into order list
+                orderList.push(orderItem);
             });
 
             // pass createOrderDetails is loaded
@@ -42,16 +77,7 @@ export class OrderList extends Component {
 
     render() {
         if (this.state.isOrderLoaded) {
-            return (
-                <div>
-                    <Row>
-                        <Col sm={12}>
-                            <h1>OrderList</h1>
-                        </Col>
-                    </Row>
-                    {this.state.orderList}
-                </div>
-            );
+            return <div>{this.createOrderList(this.state.orderList)}</div>;
         } else {
             return <div>Loading...</div>;
         }
