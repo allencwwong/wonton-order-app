@@ -40,7 +40,6 @@ export class OrderList extends Component {
     };
 
     componentDidMount() {
-        console.log(this.ordersRef);
         this.ordersRef.on('value', (snapshot) => {
             let orders = snapshot.val(),
                 orderIds = Object.keys(orders),
