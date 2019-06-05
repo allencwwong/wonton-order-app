@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Row, Col } from '../../_styles';
+import { Row, Col, InputGroup, Button, FormControl } from '../../_styles';
+import { OrderBar } from './OrderBar';
 
 export class ProductOrderPanel extends Component {
     // get props - name , img , price
@@ -8,12 +9,72 @@ export class ProductOrderPanel extends Component {
     // on OrderBar submit send order data - orderInfo: {buyer, date, grandTotal} orderId: {name , price , qty , total }
     // redirect to dashboard/:id page
     render() {
-        return (
-            <Row>
-                <Col>
-                    <h1>ProductOrderPanel</h1>
-                </Col>
-            </Row>
-        );
+        const {
+            isProductSelected,
+            selectedProduct,
+            products,
+            selectedTotal,
+        } = this.props;
+        if (isProductSelected) {
+            let currProduct = {
+                name: products[selectedProduct].name.cn,
+                icon: products[selectedProduct].icon,
+                price: products[selectedProduct].price,
+            };
+            return (
+                <div>
+                    <Row>
+                        <Col sm={12} md={4}>
+                            <h1>{currProduct.name}</h1>
+                            <h2>Id: {selectedProduct}</h2>
+                            <h2>{currProduct.icon}</h2>
+                            <h2>${currProduct.price}</h2>
+                        </Col>
+                        <Col sm={12} md={8}>
+                            <Row>
+                                <Col>
+                                    <h1>qty comp</h1>
+                                </Col>
+                            </Row>
+                            <InputGroup className="mb-3">
+                                <Row>
+                                    <Col>
+                                        <InputGroup.Prepend>
+                                            <Button
+                                                variant="outline-success"
+                                                onClick={() =>
+                                                    this.props.handleClickIncrement()
+                                                }>
+                                                +
+                                            </Button>
+                                        </InputGroup.Prepend>
+                                    </Col>
+                                    <Col>
+                                        <p>{this.props.selectedQty}</p>
+                                    </Col>
+                                    <Col>
+                                        <InputGroup.Append>
+                                            <Button
+                                                variant="outline-danger"
+                                                onClick={() =>
+                                                    this.props.handleClickDecrement()
+                                                }>
+                                                -
+                                            </Button>
+                                        </InputGroup.Append>
+                                    </Col>
+                                </Row>
+                            </InputGroup>
+                        </Col>
+                    </Row>
+                    <OrderBar
+                        selectedTotal={selectedTotal}
+                        handleClickSubmit={this.props.handleClickAddProduct}
+                    />
+                </div>
+            );
+        } else {
+            return <div>select a product</div>;
+        }
     }
 }

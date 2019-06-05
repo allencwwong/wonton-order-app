@@ -41,7 +41,6 @@ export class OrderDetails extends Component {
 
     render() {
         const { order } = this.props.order;
-        console.log(this.props);
         if (this.state.isProductLoaded) {
             return (
                 <Table className="order-details" responsive hover size="sm">

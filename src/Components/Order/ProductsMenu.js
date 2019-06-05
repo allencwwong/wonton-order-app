@@ -10,7 +10,6 @@ export class ProductsMenu extends Component {
         } else {
             isSelectedProduct = false;
         }
-        console.log(isSelectedProduct);
         return (
             <Col xs={3} key={idx}>
                 <CSSProductsMenuItem active={isSelectedProduct}>
@@ -50,6 +49,15 @@ export class ProductsMenu extends Component {
             );
         });
 
-        return <Row>{productsMenu}</Row>;
+        return (
+            <div>
+                <Row>
+                    <Col>
+                        <h1>Products:</h1>
+                    </Col>
+                </Row>
+                <Row>{productsMenu}</Row>
+            </div>
+        );
     }
 }
