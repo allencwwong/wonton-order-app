@@ -5,7 +5,7 @@ import {
     ProductsMenu,
     OrderBar,
 } from './../../Components/Order';
-import { Container, Row, Col } from './../../_styles';
+import { Container, Row, Col, Card } from './../../_styles';
 import { database } from './../../firebase';
 
 export class OrderNew extends Component {
@@ -15,34 +15,41 @@ export class OrderNew extends Component {
     constructor(props) {
         super(props);
         this.productRef = database.ref('/products');
+        this.ordersRef = database.ref('/orders');
+        this.orderAmountRef = database.ref('/orderamount');
         this.state = {
             isProductLoaded: false,
-            selectedProduct: 'wt',
             isProductSelected: true,
             products: null,
+            selectedProduct: null,
             selectedPrice: 0,
             selectedQty: 0,
             selectedTotal: 0,
-            totalQty: 0,
-            total: 0,
+            selectedProductList: {},
             buyer: '',
             date: '',
+            status: 'open',
             order: {
                 isOrder: false,
                 buyer: '',
                 date: '',
+                oid: '',
                 orderDetails: {
-                    wt: {
-                        qty: 0,
-                    },
-                    ps: {
-                        qty: 0,
-                    },
-                    dhk: {
-                        qty: 0,
-                    },
-                    dce: {
-                        qty: 0,
+                    total: 0,
+                    totalQty: 0,
+                    products: {
+                        wt: {
+                            qty: 0,
+                        },
+                        ps: {
+                            qty: 0,
+                        },
+                        dhk: {
+                            qty: 0,
+                        },
+                        dce: {
+                            qty: 0,
+                        },
                     },
                 },
             },
@@ -50,20 +57,31 @@ export class OrderNew extends Component {
     }
 
     handleClickSelectItem = (e) => {
-        let selectedProduct = e.currentTarget.getAttribute('data-pid');
+        let selectedProduct = e.currentTarget.getAttribute('data-pid'),
+            selectedQty = this.state.order.orderDetails.products[
+                selectedProduct
+            ].qty,
+            selectedTotal = this.selectedTotal(
+                selectedQty,
+                this.state.products[selectedProduct].price,
+            );
 
         if (selectedProduct !== this.state.selectedProduct) {
             this.setState({
                 isProductSelected: true,
                 selectedProduct: selectedProduct,
-                selectedQty: 0,
-                selectedTotal: 0,
+                selectedQty: selectedQty,
+                selectedTotal: selectedTotal,
+            });
+        } else if (selectedProduct === this.state.selectedProduct) {
+            this.setState({
+                isProductSelected: false,
+                selectedProduct: null,
             });
         }
     };
 
     handleClickIncrement = () => {
-        console.log('+1');
         let selectedQty = this.state.selectedQty + 1,
             order = this.state.order;
 
@@ -77,11 +95,9 @@ export class OrderNew extends Component {
             ),
             order: order,
         });
-        console.log(this.state.order);
     };
 
     handleClickDecrement = () => {
-        console.log('-1');
         let selectedQty = this.state.selectedQty - 1,
             order = this.state.order;
         // reset to zero - no order
@@ -107,18 +123,19 @@ export class OrderNew extends Component {
     handleClickAddProduct = () => {
         const { selectedQty, selectedProduct } = this.state;
         let order = this.state.order,
-            orderDetails = order.orderDetails[selectedProduct],
-            allOrderDetails = order.orderDetails,
+            orderDetails = order.orderDetails.products[selectedProduct],
+            allOrderDetails = order.orderDetails.products,
             total = 0,
+            totalQty = 0,
             orderDetailsId;
         // set order
         orderDetails.qty = selectedQty;
         orderDetails.selectedTotal = this.state.selectedTotal;
         // calc total
         orderDetailsId = Object.keys(allOrderDetails);
-        console.log(orderDetailsId);
         orderDetailsId.forEach((id) => {
             if (allOrderDetails[id].qty > 0) {
+                totalQty += allOrderDetails[id].qty;
                 total += this.selectedTotal(
                     allOrderDetails[id].qty,
                     this.state.products[id].price,
@@ -126,30 +143,87 @@ export class OrderNew extends Component {
             }
         });
 
+        order.orderDetails.total = total;
+        order.orderDetails.totalQty = totalQty;
+
+        // keep track of selected product(s) for edit propose
+        var updatedSelectedProductList = this.state.selectedProductList;
+        updatedSelectedProductList[selectedProduct] = 1;
+
         this.setState({
             order: order,
             selectedProduct: null,
             isProductSelected: false,
-            total: total,
+            selectedProductList: updatedSelectedProductList,
+        });
+
+        console.log('submitted order:');
+        console.log(this.state.order);
+    };
+
+    handleClickEditItem = (pid) => {
+        console.log('selected edit');
+        this.setState({
+            selectedProduct: pid,
+            isProductSelected: true,
         });
     };
 
     handleClickRemoveOrder = (pid) => {
-        console.log('remove order:', pid);
         let order = this.state.order,
-            orderDetails = order.orderDetails[pid];
+            orderDetails = order.orderDetails.products[pid],
+            updatedSelectedProductList = this.state.selectedProductList;
+
+        // subtract removed total
+        order.orderDetails.total -= this.selectedTotal(
+            order.orderDetails.products[pid].qty,
+            this.state.products[pid].price,
+        );
+
+        // reset orderDetail
         orderDetails.qty = 0;
         orderDetails.selectedTotal = 0;
-        console.log(orderDetails);
+        updatedSelectedProductList[pid] = 0;
+
         this.setState({
             order: order,
+            selectedProductList: updatedSelectedProductList,
         });
     };
 
     handleClickSubmitOrder = () => {
-        // push order to db
-        alert('data submitted');
-        // redirect to order details page
+        let order = this.state.order;
+        this.ordersRef
+            .push({
+                buyer: this.state.buyer,
+                data: this.state.date,
+                status: this.state.status,
+                order: order,
+            })
+            .then(() => {
+                // redirect to create page
+                alert('updated!');
+            });
+        // let oid;
+        // this.orderAmountRef.on('value', (snapshot) => {
+        //     let order = this.state.order;
+        //     // increment id by 1
+        //     oid = snapshot.val() + 1;
+        //     order.oid = oid;
+        //     // updated db
+        //     // push order to db
+        //     this.ordersRef
+        //         .push({
+        //             buyer: this.state.buyer,
+        //             data: this.state.date,
+        //             status: this.state.status,
+        //             order: order,
+        //         })
+        //         .then(() => {
+        //             // redirect to create page
+        //             alert('updated!');
+        //         });
+        // });
     };
 
     // helper function
@@ -158,49 +232,14 @@ export class OrderNew extends Component {
     };
 
     componentDidMount() {
-        // this.productRef.on('value', (snapshot) => {
-        //     console.log(snapshot);
-        //     let products = snapshot.val();
-        //     this.setState({
-        //         isProductLoaded: true,
-        //         products: products,
-        //     });
-        // });
-
-        // local dev
-        let products = {
-            wt: {
-                name: {
-                    en: 'wonton',
-                    cn: 'cn wonton',
-                },
-                price: 14.5,
-            },
-            ps: {
-                name: {
-                    en: 'ps',
-                    cn: 'cn ps',
-                },
-                price: 12.5,
-            },
-            dhk: {
-                name: {
-                    en: 'dhk',
-                    cn: 'cn dhk',
-                },
-                price: 16.5,
-            },
-            dce: {
-                name: {
-                    en: 'dce',
-                    cn: 'cn dce',
-                },
-                price: 13.5,
-            },
-        };
-        this.setState({
-            isProductLoaded: true,
-            products: products,
+        this.productRef.on('value', (snapshot) => {
+            let products = snapshot.val();
+            this.setState({
+                isProductLoaded: true,
+                products: products,
+                selectedProduct: 'wt',
+                selectedPrice: products.wt.price,
+            });
         });
     }
 
@@ -218,43 +257,72 @@ export class OrderNew extends Component {
                             />
                         </Col>
                     </Row>
-                    <Row>
-                        <Col>
-                            <ProductOrderPanel
-                                selectedProduct={this.state.selectedProduct}
-                                products={this.state.products}
-                                selectedQty={this.state.selectedQty}
-                                handleClickIncrement={this.handleClickIncrement}
-                                handleClickDecrement={this.handleClickDecrement}
-                                handleClickAddProduct={
-                                    this.handleClickAddProduct
-                                }
-                                order={this.state.order}
-                                selectedTotal={this.state.selectedTotal}
-                                isProductSelected={this.state.isProductSelected}
-                            />
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <OrderDetails
-                                order={this.state.order}
-                                products={this.state.products}
-                                handleClickRemoveOrder={
-                                    this.handleClickRemoveOrder
-                                }
-                            />
-                        </Col>
-                    </Row>
-                    {this.state.total > 0 && (
+                    {this.state.isProductSelected && (
                         <Row>
-                            <Col>
-                                <OrderBar
-                                    selectedTotal={this.state.total}
-                                    handleClickSubmit={
-                                        this.handleClickSubmitOrder
-                                    }
-                                />
+                            <Col className="my-3">
+                                <Card>
+                                    <ProductOrderPanel
+                                        selectedProduct={
+                                            this.state.selectedProduct
+                                        }
+                                        products={this.state.products}
+                                        selectedQty={this.state.selectedQty}
+                                        handleClickIncrement={
+                                            this.handleClickIncrement
+                                        }
+                                        handleClickDecrement={
+                                            this.handleClickDecrement
+                                        }
+                                        handleClickAddProduct={
+                                            this.handleClickAddProduct
+                                        }
+                                        order={this.state.order}
+                                        selectedTotal={this.state.selectedTotal}
+                                        isProductSelected={
+                                            this.state.isProductSelected
+                                        }
+                                    />
+                                </Card>
+                            </Col>
+                        </Row>
+                    )}
+
+                    {this.state.order.orderDetails.total > 0 && (
+                        <Row>
+                            <Col sm={12}>
+                                <Card className="mt-3">
+                                    <OrderDetails
+                                        order={this.state.order}
+                                        products={this.state.products}
+                                        handleClickRemoveOrder={
+                                            this.handleClickRemoveOrder
+                                        }
+                                        handleClickEditItem={
+                                            this.handleClickEditItem
+                                        }
+                                    />
+                                    {this.state.order.orderDetails.total >
+                                        0 && (
+                                        <Card.Footer>
+                                            <Row>
+                                                <Col>
+                                                    <OrderBar
+                                                        bartype="total"
+                                                        selectedTotal={
+                                                            this.state.order
+                                                                .orderDetails
+                                                                .total
+                                                        }
+                                                        handleClickSubmit={
+                                                            this
+                                                                .handleClickSubmitOrder
+                                                        }
+                                                    />
+                                                </Col>
+                                            </Row>
+                                        </Card.Footer>
+                                    )}
+                                </Card>
                             </Col>
                         </Row>
                     )}

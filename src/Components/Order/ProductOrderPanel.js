@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Row, Col, InputGroup, Button, FormControl } from '../../_styles';
+import { Row, Col, InputGroup, Button, Card } from '../../_styles';
 import { OrderBar } from './OrderBar';
 
 export class ProductOrderPanel extends Component {
@@ -22,59 +22,63 @@ export class ProductOrderPanel extends Component {
                 price: products[selectedProduct].price,
             };
             return (
-                <div>
-                    <Row>
-                        <Col sm={12} md={4}>
-                            <h1>{currProduct.name}</h1>
-                            <h2>Id: {selectedProduct}</h2>
-                            <h2>{currProduct.icon}</h2>
-                            <h2>${currProduct.price}</h2>
-                        </Col>
-                        <Col sm={12} md={8}>
-                            <Row>
-                                <Col>
-                                    <h1>qty comp</h1>
-                                </Col>
-                            </Row>
-                            <InputGroup className="mb-3">
+                <>
+                    <Card.Body>
+                        <Row>
+                            <Col sm={12} md={4}>
+                                <h1>{currProduct.name}</h1>
+                                <h2>Id: {selectedProduct}</h2>
+                                <h2>{currProduct.icon}</h2>
+                                <h2>${currProduct.price}</h2>
+                            </Col>
+                            <Col sm={12} md={8}>
                                 <Row>
                                     <Col>
-                                        <InputGroup.Prepend>
-                                            <Button
-                                                variant="outline-success"
-                                                onClick={() =>
-                                                    this.props.handleClickIncrement()
-                                                }>
-                                                +
-                                            </Button>
-                                        </InputGroup.Prepend>
-                                    </Col>
-                                    <Col>
-                                        <p>{this.props.selectedQty}</p>
-                                    </Col>
-                                    <Col>
-                                        <InputGroup.Append>
-                                            <Button
-                                                variant="outline-danger"
-                                                onClick={() =>
-                                                    this.props.handleClickDecrement()
-                                                }>
-                                                -
-                                            </Button>
-                                        </InputGroup.Append>
+                                        <h1>qty comp</h1>
                                     </Col>
                                 </Row>
-                            </InputGroup>
-                        </Col>
-                    </Row>
-                    <OrderBar
-                        selectedTotal={selectedTotal}
-                        handleClickSubmit={this.props.handleClickAddProduct}
-                    />
-                </div>
+                                <InputGroup className="mb-3">
+                                    <Row>
+                                        <Col>
+                                            <InputGroup.Prepend>
+                                                <Button
+                                                    variant="outline-success"
+                                                    onClick={() =>
+                                                        this.props.handleClickIncrement()
+                                                    }>
+                                                    +
+                                                </Button>
+                                            </InputGroup.Prepend>
+                                        </Col>
+                                        <Col>
+                                            <p>{this.props.selectedQty}</p>
+                                        </Col>
+                                        <Col>
+                                            <InputGroup.Append>
+                                                <Button
+                                                    variant="outline-danger"
+                                                    onClick={() =>
+                                                        this.props.handleClickDecrement()
+                                                    }>
+                                                    -
+                                                </Button>
+                                            </InputGroup.Append>
+                                        </Col>
+                                    </Row>
+                                </InputGroup>
+                            </Col>
+                        </Row>
+                    </Card.Body>
+                    <Card.Footer>
+                        <OrderBar
+                            selectedTotal={selectedTotal}
+                            handleClickSubmit={this.props.handleClickAddProduct}
+                        />
+                    </Card.Footer>
+                </>
             );
         } else {
-            return <div>select a product</div>;
+            return <div className="d-none">select a product</div>;
         }
     }
 }

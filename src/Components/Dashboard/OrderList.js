@@ -15,11 +15,11 @@ export class OrderList extends Component {
     createOrderList = (orderList) => {
         let orderListRender = [];
         orderList.forEach((order, idx, arr) => {
-            if (order.status === 'active') {
+            if (order.status === 'open') {
                 if (idx === 0) {
                     orderListRender.push(
                         <h2>
-                            Active Orders
+                            Open Orders
                             <span>
                                 <Badge pill variant="primary">
                                     {arr.length}
@@ -44,7 +44,6 @@ export class OrderList extends Component {
             let orders = snapshot.val(),
                 orderIds = Object.keys(orders),
                 orderList = [];
-
             orderIds.forEach((id, idx) => {
                 let orderItem = {};
                 // set order item render

@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
 import { Row, Col, Button } from './../../_styles';
+import { CSSOrderBar } from './_styles';
 
 export class OrderBar extends Component {
     render() {
         let { selectedTotal } = this.props;
         return (
-            <Row>
+            <CSSOrderBar bartype={this.props.bartype}>
                 <Col sm={6} md={8}>
                     <h2>Total: ${selectedTotal}</h2>
                 </Col>
@@ -14,7 +15,7 @@ export class OrderBar extends Component {
                         Submit
                     </Button>
                 </Col>
-            </Row>
+            </CSSOrderBar>
         );
     }
 }

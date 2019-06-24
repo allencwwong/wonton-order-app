@@ -18,7 +18,7 @@ export class Dashboard extends Component {
                             <h1>Dashboard</h1>
                         </Col>
                         <Col xs={6} sm={9}>
-                            <div className="btn btn-primary">Add</div>
+                            <a href="/createorder" className="btn btn-primary">Add</a>
                         </Col>
                     </Row>
                     <OrderList />

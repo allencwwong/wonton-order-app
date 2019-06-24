@@ -13,23 +13,28 @@ export class OrderDetails extends Component {
 
     componentDidMount() {
         this.productRef.on('value', (snapshot) => {
-            const { order } = this.props.order;
+            const { orderDetails } = this.props.order.order;
+
             let products = snapshot.val(),
-                orderItemIds = Object.keys(order),
+                orderItemIds = Object.keys(orderDetails.products),
                 orderItems = [];
 
             orderItemIds.forEach((id, idx, arr) => {
+                console.log('id', id);
+                console.log('pid', products[id].name.cn);
                 let name = products[id].name.cn,
                     price = products[id].price;
 
-                orderItems.push(
-                    <tr key={idx}>
-                        <td>{name}</td>
-                        <td>{price}</td>
-                        <td>{order[id].qty}</td>
-                        <td>{order[id].total}</td>
-                    </tr>,
-                );
+                if (orderDetails.products[id].qty > 0) {
+                    orderItems.push(
+                        <tr key={idx}>
+                            <td>{name}</td>
+                            <td>{price}</td>
+                            <td>{orderDetails.products[id].qty}</td>
+                            <td>{orderDetails.products[id].total}</td>
+                        </tr>,
+                    );
+                }
             });
 
             this.setState({
