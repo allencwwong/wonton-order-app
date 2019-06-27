@@ -41,41 +41,49 @@ export class OrderList extends Component {
 
     componentDidMount() {
         this.ordersRef.on('value', (snapshot) => {
-            let orders = snapshot.val(),
-                orderIds = Object.keys(orders),
-                orderList = [];
-            orderIds.forEach((id, idx) => {
-                let orderItem = {};
-                // set order item render
-                orderItem.render = [];
-                // set order item status to sort in dashboard
-                orderItem.status = orders[id].status;
-                // create order item render
-                orderItem.render.push(
-                    <Row key={idx}>
-                        <Col sm={12} md={3}>
-                            <OrderInfo />
-                        </Col>
-                        <Col sm={12} md={8}>
-                            <OrderDetails order={orders[id]} />
-                        </Col>
-                    </Row>,
-                );
-                // set order item into order list
-                orderList.push(orderItem);
-            });
+            if (snapshot.exists()) {
+                let orders = snapshot.val(),
+                    orderIds = Object.keys(orders),
+                    orderList = [];
+                orderIds.forEach((id, idx) => {
+                    let orderItem = {};
+                    // set order item render
+                    orderItem.render = [];
+                    // set order item status to sort in dashboard
+                    orderItem.status = orders[id].status;
+                    // create order item render
+                    orderItem.render.push(
+                        <Row key={idx}>
+                            <Col sm={12} md={3}>
+                                <OrderInfo />
+                            </Col>
+                            <Col sm={12} md={8}>
+                                <OrderDetails order={orders[id]} />
+                            </Col>
+                        </Row>,
+                    );
+                    // set order item into order list
+                    orderList.push(orderItem);
+                });
 
-            // pass createOrderDetails is loaded
-            this.setState({
-                isOrderLoaded: true,
-                orderList: orderList,
-            });
+                // pass createOrderDetails is loaded
+                this.setState({
+                    isOrderLoaded: true,
+                    orderList: orderList,
+                });
+            } else {
+                this.setState({
+                    isOrder: false,
+                });
+            }
         });
     }
 
     render() {
         if (this.state.isOrderLoaded) {
             return <div>{this.createOrderList(this.state.orderList)}</div>;
+        } else if (!this.state.isOrder) {
+            return <div>No Data...</div>;
         } else {
             return <div>Loading...</div>;
         }

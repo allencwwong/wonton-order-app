@@ -5,7 +5,7 @@ import {
     ProductsMenu,
     OrderBar,
 } from './../../Components/Order';
-import { Container, Row, Col } from './../../_styles';
+import { Container, Row, Col, Card } from './../../_styles';
 import { database } from './../../firebase';
 
 export class OrderDetails extends Component {
@@ -15,20 +15,12 @@ export class OrderDetails extends Component {
     constructor(props) {
         super(props);
         this.productRef = database.ref('/products');
+        this.orderRef = database.ref('/orders');
         this.state = {
             isEdit: false,
             isProductLoaded: false,
             selectedProduct: null,
             isProductSelected: false,
-            products: null,
-            selectedPrice: 0,
-            selectedQty: 0,
-            selectedTotal: 0,
-            totalQty: 0,
-            total: 0,
-            buyer: '',
-            date: '',
-            order: {},
         };
     }
 
@@ -137,10 +129,15 @@ export class OrderDetails extends Component {
     componentDidMount() {
         this.productRef.on('value', (snapshot) => {
             let products = snapshot.val();
-            this.setState({
-                isProductLoaded: true,
-                products: products,
-                order: {},
+            this.orderRef.on('value', (snapshot) => {
+                const orders = snapshot.val(),
+                    oid = window.location.pathname.split('/')[2];
+
+                this.setState({
+                    isProductLoaded: true,
+                    products: products,
+                    order: orders[oid],
+                });
             });
         });
     }
@@ -149,52 +146,72 @@ export class OrderDetails extends Component {
         if (this.state.isProductLoaded) {
             return (
                 <Container>
-                    <Row>
-                        <Col>
-                            <OrderDetailsBlock
-                                order={this.state.order}
-                                products={this.state.products}
-                                handleClickRemoveOrder={
-                                    this.handleClickRemoveOrder
-                                }
-                            />
-                        </Col>
-                    </Row>
-                    {this.state.isEdit && (
+                    {this.state.isProductSelected && (
                         <Row>
-                            <Col>
-                                <ProductOrderPanel
-                                    selectedProduct={this.state.selectedProduct}
-                                    products={this.state.products}
-                                    selectedQty={this.state.selectedQty}
-                                    handleClickIncrement={
-                                        this.handleClickIncrement
-                                    }
-                                    handleClickDecrement={
-                                        this.handleClickDecrement
-                                    }
-                                    handleClickAddProduct={
-                                        this.handleClickAddProduct
-                                    }
-                                    order={this.state.order}
-                                    selectedTotal={this.state.selectedTotal}
-                                    isProductSelected={
-                                        this.state.isProductSelected
-                                    }
-                                />
+                            <Col className="my-3">
+                                <Card>
+                                    <ProductOrderPanel
+                                        selectedProduct={
+                                            this.state.selectedProduct
+                                        }
+                                        products={this.state.products}
+                                        selectedQty={this.state.selectedQty}
+                                        handleClickIncrement={
+                                            this.handleClickIncrement
+                                        }
+                                        handleClickDecrement={
+                                            this.handleClickDecrement
+                                        }
+                                        handleClickAddProduct={
+                                            this.handleClickAddProduct
+                                        }
+                                        order={this.state.order}
+                                        selectedTotal={this.state.selectedTotal}
+                                        isProductSelected={
+                                            this.state.isProductSelected
+                                        }
+                                    />
+                                </Card>
                             </Col>
                         </Row>
                     )}
-                    {this.state.isEdit && this.state.total > 0 && (
+
+                    {this.state.order.orderDetails.total > 0 && (
                         <Row>
-                            <Col>
-                                <OrderBar
-                                    bartype="total"
-                                    selectedTotal={this.state.total}
-                                    handleClickSubmit={
-                                        this.handleClickUpdateOrder
-                                    }
-                                />
+                            <Col sm={12}>
+                                <Card className="mt-3">
+                                    <OrderDetails
+                                        order={this.state.order}
+                                        products={this.state.products}
+                                        handleClickRemoveOrder={
+                                            this.handleClickRemoveOrder
+                                        }
+                                        handleClickEditItem={
+                                            this.handleClickEditItem
+                                        }
+                                    />
+                                    {this.state.order.orderDetails.total >
+                                        0 && (
+                                        <Card.Footer>
+                                            <Row>
+                                                <Col>
+                                                    <OrderBar
+                                                        bartype="total"
+                                                        selectedTotal={
+                                                            this.state.order
+                                                                .orderDetails
+                                                                .total
+                                                        }
+                                                        handleClickSubmit={
+                                                            this
+                                                                .handleClickSubmitOrder
+                                                        }
+                                                    />
+                                                </Col>
+                                            </Row>
+                                        </Card.Footer>
+                                    )}
+                                </Card>
                             </Col>
                         </Row>
                     )}

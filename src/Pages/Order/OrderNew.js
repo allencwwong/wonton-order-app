@@ -16,7 +16,7 @@ export class OrderNew extends Component {
         super(props);
         this.productRef = database.ref('/products');
         this.ordersRef = database.ref('/orders');
-        this.orderAmountRef = database.ref('/orderamount');
+        this.orderCountRef = database.ref('/ordercount');
         this.state = {
             isProductLoaded: false,
             isProductSelected: true,
@@ -29,11 +29,11 @@ export class OrderNew extends Component {
             buyer: '',
             date: '',
             status: 'open',
+            oid: 0,
             order: {
                 isOrder: false,
                 buyer: '',
                 date: '',
-                oid: '',
                 orderDetails: {
                     total: 0,
                     totalQty: 0,
@@ -192,38 +192,22 @@ export class OrderNew extends Component {
     };
 
     handleClickSubmitOrder = () => {
-        let order = this.state.order;
+        let { order, oid } = this.state;
+        oid += 1;
         this.ordersRef
             .push({
                 buyer: this.state.buyer,
                 data: this.state.date,
                 status: this.state.status,
+                oid: oid,
                 order: order,
             })
-            .then(() => {
+            .then((snapshot) => {
                 // redirect to create page
-                alert('updated!');
+                this.props.history.push(`/order/${snapshot.key}`);
             });
-        // let oid;
-        // this.orderAmountRef.on('value', (snapshot) => {
-        //     let order = this.state.order;
-        //     // increment id by 1
-        //     oid = snapshot.val() + 1;
-        //     order.oid = oid;
-        //     // updated db
-        //     // push order to db
-        //     this.ordersRef
-        //         .push({
-        //             buyer: this.state.buyer,
-        //             data: this.state.date,
-        //             status: this.state.status,
-        //             order: order,
-        //         })
-        //         .then(() => {
-        //             // redirect to create page
-        //             alert('updated!');
-        //         });
-        // });
+        // increment order
+        this.orderCountRef.set(oid);
     };
 
     // helper function
@@ -232,6 +216,11 @@ export class OrderNew extends Component {
     };
 
     componentDidMount() {
+        this.orderCountRef.on('value', (snapshot) => {
+            this.setState({
+                oid: snapshot.val(),
+            });
+        });
         this.productRef.on('value', (snapshot) => {
             let products = snapshot.val();
             this.setState({
