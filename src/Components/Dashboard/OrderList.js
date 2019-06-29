@@ -55,7 +55,7 @@ export class OrderList extends Component {
                     orderItem.render.push(
                         <Row key={idx}>
                             <Col sm={12} md={3}>
-                                <OrderInfo />
+                                <OrderInfo oid={id} />
                             </Col>
                             <Col sm={12} md={8}>
                                 <OrderDetails order={orders[id]} />

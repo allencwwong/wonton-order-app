@@ -2,37 +2,78 @@ import React, { Component } from 'react';
 import {
     ProductOrderPanel,
     OrderDetails as OrderDetailsBlock,
-    ProductsMenu,
     OrderBar,
 } from './../../Components/Order';
 import { Container, Row, Col, Card } from './../../_styles';
 import { database } from './../../firebase';
 
 export class OrderDetails extends Component {
-    // load products
-    // loop thru products to create selector menu component with associate id
-    // based on id render selector panel => pass in props info - name , img , price
     constructor(props) {
         super(props);
         this.productRef = database.ref('/products');
-        this.orderRef = database.ref('/orders');
+        this.ordersRef = database.ref('/orders');
+        this.orderCountRef = database.ref('/ordercount');
         this.state = {
-            isEdit: false,
+            isLoadingOrder: true,
             isProductLoaded: false,
-            selectedProduct: null,
             isProductSelected: false,
+            products: null,
+            selectedProduct: null,
+            selectedPrice: 0,
+            selectedQty: 0,
+            selectedTotal: 0,
+            selectedProductList: {},
+            buyer: '',
+            date: '',
+            status: 'open',
+            oid: 0,
+            order: {
+                isOrder: false,
+                buyer: '',
+                date: '',
+                orderDetails: {
+                    total: 0,
+                    totalQty: 0,
+                    products: {
+                        wt: {
+                            qty: 0,
+                        },
+                        ps: {
+                            qty: 0,
+                        },
+                        dhk: {
+                            qty: 0,
+                        },
+                        dce: {
+                            qty: 0,
+                        },
+                    },
+                },
+            },
         };
     }
 
     handleClickSelectItem = (e) => {
-        let selectedProduct = e.currentTarget.getAttribute('data-pid');
+        let selectedProduct = e.currentTarget.getAttribute('data-pid'),
+            selectedQty = this.state.order.orderDetails.products[
+                selectedProduct
+            ].qty,
+            selectedTotal = this.selectedTotal(
+                selectedQty,
+                this.state.products[selectedProduct].price,
+            );
 
         if (selectedProduct !== this.state.selectedProduct) {
             this.setState({
                 isProductSelected: true,
                 selectedProduct: selectedProduct,
-                selectedQty: 0,
-                selectedTotal: 0,
+                selectedQty: selectedQty,
+                selectedTotal: selectedTotal,
+            });
+        } else if (selectedProduct === this.state.selectedProduct) {
+            this.setState({
+                isProductSelected: false,
+                selectedProduct: null,
             });
         }
     };
@@ -79,9 +120,10 @@ export class OrderDetails extends Component {
     handleClickAddProduct = () => {
         const { selectedQty, selectedProduct } = this.state;
         let order = this.state.order,
-            orderDetails = order.orderDetails[selectedProduct],
-            allOrderDetails = order.orderDetails,
+            orderDetails = order.orderDetails.products[selectedProduct],
+            allOrderDetails = order.orderDetails.products,
             total = 0,
+            totalQty = 0,
             orderDetailsId;
         // set order
         orderDetails.qty = selectedQty;
@@ -90,6 +132,7 @@ export class OrderDetails extends Component {
         orderDetailsId = Object.keys(allOrderDetails);
         orderDetailsId.forEach((id) => {
             if (allOrderDetails[id].qty > 0) {
+                totalQty += allOrderDetails[id].qty;
                 total += this.selectedTotal(
                     allOrderDetails[id].qty,
                     this.state.products[id].price,
@@ -97,28 +140,52 @@ export class OrderDetails extends Component {
             }
         });
 
+        order.orderDetails.total = total;
+        order.orderDetails.totalQty = totalQty;
+
+        // keep track of selected product(s) for edit propose
+        var updatedSelectedProductList = this.state.selectedProductList;
+        updatedSelectedProductList[selectedProduct] = 1;
+
         this.setState({
             order: order,
             selectedProduct: null,
             isProductSelected: false,
-            total: total,
+            selectedProductList: updatedSelectedProductList,
+        });
+
+        console.log('submitted order:');
+        console.log(this.state.order);
+    };
+
+    handleClickEditItem = (pid) => {
+        console.log('selected edit');
+        this.setState({
+            selectedProduct: pid,
+            isProductSelected: true,
         });
     };
 
     handleClickRemoveOrder = (pid) => {
         let order = this.state.order,
-            orderDetails = order.orderDetails[pid];
+            orderDetails = order.orderDetails.products[pid],
+            updatedSelectedProductList = this.state.selectedProductList;
+
+        // subtract removed total
+        order.orderDetails.total -= this.selectedTotal(
+            order.orderDetails.products[pid].qty,
+            this.state.products[pid].price,
+        );
+
+        // reset orderDetail
         orderDetails.qty = 0;
         orderDetails.selectedTotal = 0;
+        updatedSelectedProductList[pid] = 0;
+
         this.setState({
             order: order,
+            selectedProductList: updatedSelectedProductList,
         });
-    };
-
-    handleClickUpdateOrder = () => {
-        // push order to db
-        alert('data submitted');
-        // redirect to order details page
     };
 
     // helper function
@@ -127,17 +194,27 @@ export class OrderDetails extends Component {
     };
 
     componentDidMount() {
+        this.orderCountRef.on('value', (snapshot) => {
+            this.setState({
+                oid: snapshot.val(),
+            });
+        });
         this.productRef.on('value', (snapshot) => {
             let products = snapshot.val();
-            this.orderRef.on('value', (snapshot) => {
-                const orders = snapshot.val(),
+            this.ordersRef.on('value', (snapshot) => {
+                let orders = snapshot.val(),
                     oid = window.location.pathname.split('/')[2];
-
-                this.setState({
-                    isProductLoaded: true,
-                    products: products,
-                    order: orders[oid],
-                });
+                if (snapshot.exists() && orders[oid]) {
+                    this.setState({
+                        isProductLoaded: true,
+                        products: products,
+                        order: orders[oid].order,
+                    });
+                } else {
+                    this.setState({
+                        isLoadingOrder: false,
+                    });
+                }
             });
         });
     }
@@ -146,6 +223,11 @@ export class OrderDetails extends Component {
         if (this.state.isProductLoaded) {
             return (
                 <Container>
+                    <Row>
+                        <Col>
+                            <h1>Order Details</h1>
+                        </Col>
+                    </Row>
                     {this.state.isProductSelected && (
                         <Row>
                             <Col className="my-3">
@@ -180,7 +262,7 @@ export class OrderDetails extends Component {
                         <Row>
                             <Col sm={12}>
                                 <Card className="mt-3">
-                                    <OrderDetails
+                                    <OrderDetailsBlock
                                         order={this.state.order}
                                         products={this.state.products}
                                         handleClickRemoveOrder={
@@ -203,8 +285,7 @@ export class OrderDetails extends Component {
                                                                 .total
                                                         }
                                                         handleClickSubmit={
-                                                            this
-                                                                .handleClickSubmitOrder
+                                                            false
                                                         }
                                                     />
                                                 </Col>
@@ -217,8 +298,10 @@ export class OrderDetails extends Component {
                     )}
                 </Container>
             );
-        } else {
+        } else if (this.state.isLoadingOrder) {
             return <div>Loading...</div>;
+        } else {
+            return <div>Order Does Not Exist!</div>;
         }
     }
 }

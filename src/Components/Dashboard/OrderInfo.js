@@ -12,7 +12,11 @@ export class OrderInfo extends Component {
                 </Row>
                 <Row>
                     <Col>
-                        <button className="btn btn-primary">Edit</button>
+                        <a
+                            href={'/order/' + this.props.oid}
+                            className="btn btn-primary">
+                            Edit
+                        </a>
                     </Col>
                 </Row>
             </div>
