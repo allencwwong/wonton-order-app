@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+
 import {
     ProductOrderPanel,
     OrderDetails,
     ProductsMenu,
     OrderBar,
 } from './../../Components/Order';
-import { Container, Row, Col, Card } from './../../_styles';
+import { Container, Row, Col, Card, Form } from './../../_styles';
 import { database } from './../../firebase';
 
 export class OrderNew extends Component {
@@ -32,8 +35,8 @@ export class OrderNew extends Component {
             oid: 0,
             order: {
                 isOrder: false,
+                date: new Date(),
                 buyer: '',
-                date: '',
                 orderDetails: {
                     total: 0,
                     totalQty: 0,
@@ -197,7 +200,7 @@ export class OrderNew extends Component {
         this.ordersRef
             .push({
                 buyer: this.state.buyer,
-                data: this.state.date,
+                data: this.state.order.date,
                 status: this.state.status,
                 oid: oid,
                 order: order,
@@ -210,15 +213,33 @@ export class OrderNew extends Component {
         this.orderCountRef.set(oid);
     };
 
+    handleDateChange = (date) => {
+        console.log(date);
+        let order = this.state.order;
+        order.date = date;
+        this.setState({
+            order: order,
+        });
+        console.log(this.state.order.date);
+    };
+
     // helper function
     selectedTotal = (selectedQty, price) => {
         return selectedQty * price;
     };
 
+    formatDate = (date) => {
+        let dd = String(date.getDate()).padStart(2, '0'),
+            mm = String(date.getMonth() + 1).padStart(2, '0'),
+            yyyy = date.getFullYear(),
+            formatted = `${mm}/${dd}/${yyyy}`;
+        return formatted;
+    };
+
     componentDidMount() {
         this.orderCountRef.on('value', (snapshot) => {
             this.setState({
-                oid: snapshot.val(),
+                oid: snapshot.val() + 1,
             });
         });
         this.productRef.on('value', (snapshot) => {
@@ -236,6 +257,39 @@ export class OrderNew extends Component {
         if (this.state.isProductLoaded) {
             return (
                 <Container>
+                    <Form>
+                        <Row>
+                            <Col xs={12}>
+                                <h1>Order Info</h1>
+                            </Col>
+                            <Col>Id: {this.state.oid}</Col>
+                            <Col>
+                                <Form.Group controlId="orderInfoForm-buyer">
+                                    <Form.Label>buyer</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder="buyer"
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col>
+                                <Form.Group controlId="orderInfoForm-date">
+                                    <Form.Label>Date</Form.Label>
+                                    {this.formatDate(new Date())}
+                                </Form.Group>
+                            </Col>
+                            <Col>
+                                <Form.Group controlId="orderInfoForm-duedate">
+                                    <Form.Label>Due Date</Form.Label>
+                                    <DatePicker
+                                        selected={this.state.order.date}
+                                        onChange={this.handleDateChange}
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                    </Form>
+
                     <Row>
                         <Col>
                             <ProductsMenu

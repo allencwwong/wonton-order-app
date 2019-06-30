@@ -4,6 +4,6 @@ export * from './bootstrap/Row';
 export * from './bootstrap/Table';
 export * from './bootstrap/Badge';
 export * from './bootstrap/Card';
-export * from './bootstrap/InputGroup';
 export * from './bootstrap/Button';
-export * from './bootstrap/FormControl';
+export * from './bootstrap/Form';
+export * from './bootstrap/InputGroup';
