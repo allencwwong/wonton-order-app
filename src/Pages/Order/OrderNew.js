@@ -30,13 +30,12 @@ export class OrderNew extends Component {
             selectedTotal: 0,
             selectedProductList: {},
             buyer: '',
-            date: '',
+            date: new Date(),
+            dueDate: new Date(),
             status: 'open',
             oid: 0,
             order: {
                 isOrder: false,
-                date: new Date(),
-                buyer: '',
                 orderDetails: {
                     total: 0,
                     totalQty: 0,
@@ -160,7 +159,7 @@ export class OrderNew extends Component {
             selectedProductList: updatedSelectedProductList,
         });
 
-        console.log('submitted order:');
+        console.log('add order:');
         console.log(this.state.order);
     };
 
@@ -194,14 +193,21 @@ export class OrderNew extends Component {
         });
     };
 
+    // submit order to fb
     handleClickSubmitOrder = () => {
-        let { order, oid } = this.state;
+        console.log(this.state);
+        alert('submit order');
+        let { order, oid, date, dueDate, buyer, status} = this.state;
         oid += 1;
+        date = this.formatDate(date)
+        dueDate = this.formatDate(dueDate);
+
         this.ordersRef
             .push({
-                buyer: this.state.buyer,
-                data: this.state.order.date,
-                status: this.state.status,
+                buyer: buyer,
+                date: date,
+                dueDate: dueDate,
+                status: status,
                 oid: oid,
                 order: order,
             })
@@ -214,14 +220,17 @@ export class OrderNew extends Component {
     };
 
     handleDateChange = (date) => {
-        console.log(date);
-        let order = this.state.order;
-        order.date = date;
         this.setState({
-            order: order,
+            dueDate: date,
         });
-        console.log(this.state.order.date);
     };
+
+    handleFormBuyerChange = (e)=>{
+        let buyer = e.target.value;
+        this.setState({
+            buyer: buyer,
+        })
+    }
 
     // helper function
     selectedTotal = (selectedQty, price) => {
@@ -239,7 +248,7 @@ export class OrderNew extends Component {
     componentDidMount() {
         this.orderCountRef.on('value', (snapshot) => {
             this.setState({
-                oid: snapshot.val() + 1,
+                oid: snapshot.val(),
             });
         });
         this.productRef.on('value', (snapshot) => {
@@ -262,13 +271,14 @@ export class OrderNew extends Component {
                             <Col xs={12}>
                                 <h1>Order Info</h1>
                             </Col>
-                            <Col>Id: {this.state.oid}</Col>
+                            <Col>Id: {this.state.oid + 1}</Col>
                             <Col>
                                 <Form.Group controlId="orderInfoForm-buyer">
                                     <Form.Label>buyer</Form.Label>
                                     <Form.Control
                                         type="text"
                                         placeholder="buyer"
+                                        onChange={this.handleFormBuyerChange}
                                     />
                                 </Form.Group>
                             </Col>
@@ -282,7 +292,7 @@ export class OrderNew extends Component {
                                 <Form.Group controlId="orderInfoForm-duedate">
                                     <Form.Label>Due Date</Form.Label>
                                     <DatePicker
-                                        selected={this.state.order.date}
+                                        selected={this.state.dueDate}
                                         onChange={this.handleDateChange}
                                     />
                                 </Form.Group>
