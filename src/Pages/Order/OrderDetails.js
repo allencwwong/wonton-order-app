@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import {
     ProductOrderPanel,
     OrderDetails as OrderDetailsBlock,
     OrderBar,
+    ProductsMenu,
 } from './../../Components/Order';
-import { Container, Row, Col, Card } from './../../_styles';
+import { Container, Row, Col, Card, Form, Button } from './../../_styles';
 import { database } from './../../firebase';
 
 export class OrderDetails extends Component {
@@ -17,6 +20,7 @@ export class OrderDetails extends Component {
             isLoadingOrder: true,
             isProductLoaded: false,
             isProductSelected: false,
+            showProductMeu: false,
             products: null,
             selectedProduct: null,
             selectedPrice: 0,
@@ -153,16 +157,18 @@ export class OrderDetails extends Component {
             isProductSelected: false,
             selectedProductList: updatedSelectedProductList,
         });
-
-        console.log('submitted order:');
-        console.log(this.state.order);
     };
 
     handleClickEditItem = (pid) => {
-        console.log('selected edit');
+        let selectedQty = this.state.order.orderDetails.products[pid].qty;
         this.setState({
             selectedProduct: pid,
             isProductSelected: true,
+            selectedQty: selectedQty,
+            selectedTotal: this.selectedTotal(
+                selectedQty,
+                this.state.products[pid].price,
+            ),
         });
     };
 
@@ -173,9 +179,11 @@ export class OrderDetails extends Component {
 
         // subtract removed total
         order.orderDetails.total -= this.selectedTotal(
-            order.orderDetails.products[pid].qty,
+            orderDetails.qty,
             this.state.products[pid].price,
         );
+
+        order.orderDetails.totalQty -= order.orderDetails.products[pid].qty;
 
         // reset orderDetail
         orderDetails.qty = 0;
@@ -188,9 +196,59 @@ export class OrderDetails extends Component {
         });
     };
 
+    handleDateChange = (date) => {
+        this.setState({
+            dueDate: date,
+        });
+    };
+
+    handleClickShowProductMeu = () => {
+        this.setState({
+            showProductMeu: true,
+        });
+    };
+
+    handleClickCollapsible = () => {
+        this.setState({
+            showProductMeu: false,
+            isProductSelected: false,
+            selectedQty: 0,
+        });
+    };
+
+    // submit order to fb (update)
+    handleClickSubmitOrder = () => {
+        console.log(this.state);
+        alert('submit edited order');
+        let { order, dueDate, buyer, status } = this.state,
+            dbKey;
+
+        dueDate = this.formatDate(dueDate);
+        dbKey = window.location.pathname.split('/')[2];
+
+        database
+            .ref(`/orders/${dbKey}`)
+            .update({
+                buyer: buyer,
+                dueDate: dueDate,
+                order: order,
+            })
+            .then((snapshot) => {
+                window.location.reload();
+            });
+    };
+
     // helper function
     selectedTotal = (selectedQty, price) => {
         return selectedQty * price;
+    };
+
+    formatDate = (date) => {
+        let dd = String(date.getDate()).padStart(2, '0'),
+            mm = String(date.getMonth() + 1).padStart(2, '0'),
+            yyyy = date.getFullYear(),
+            formatted = `${mm}/${dd}/${yyyy}`;
+        return formatted;
     };
 
     componentDidMount() {
@@ -202,13 +260,20 @@ export class OrderDetails extends Component {
         this.productRef.on('value', (snapshot) => {
             let products = snapshot.val();
             this.ordersRef.on('value', (snapshot) => {
-                let orders = snapshot.val(),
-                    oid = window.location.pathname.split('/')[2];
+                let oid = window.location.pathname.split('/')[2],
+                    orders = snapshot.val(),
+                    order = orders[oid];
+
                 if (snapshot.exists() && orders[oid]) {
                     this.setState({
                         isProductLoaded: true,
                         products: products,
-                        order: orders[oid].order,
+                        order: order.order,
+                        date: order.date,
+                        dueDate: new Date(order.dueDate),
+                        buyer: order.buyer,
+                        status: order.status,
+                        oid: order.oid,
                     });
                 } else {
                     this.setState({
@@ -228,6 +293,68 @@ export class OrderDetails extends Component {
                             <h1>Order Details</h1>
                         </Col>
                     </Row>
+
+                    <Form>
+                        <Row>
+                            <Col xs={12}>
+                                <h1>Order Info</h1>
+                            </Col>
+                            <Col>Id: {this.state.oid}</Col>
+                            <Col>
+                                <Form.Group controlId="orderInfoForm-buyer">
+                                    <Form.Label>buyer</Form.Label>
+                                    {/*
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="buyer"
+                                            selected={this.state.buyer}
+                                            onChange={this.handleFormBuyerChange}
+                                        />
+                                    */}
+                                    {this.state.buyer}
+                                </Form.Group>
+                            </Col>
+                            <Col>
+                                <Form.Group controlId="orderInfoForm-date">
+                                    <Form.Label>Date</Form.Label>
+                                    {this.state.date}
+                                </Form.Group>
+                            </Col>
+                            <Col>
+                                <Form.Group controlId="orderInfoForm-duedate">
+                                    <Form.Label>Due Date</Form.Label>
+                                    <DatePicker
+                                        selected={this.state.dueDate}
+                                        onChange={this.handleDateChange}
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                    </Form>
+
+                    <Row>
+                        <Col>
+                            <Button onClick={this.handleClickShowProductMeu}>
+                                Add
+                            </Button>
+                        </Col>
+                    </Row>
+
+                    {this.state.showProductMeu && (
+                        <Row>
+                            <Col>
+                                <ProductsMenu
+                                    products={this.state.products}
+                                    selectedProduct={this.state.selectedProduct}
+                                    isProductSelected={
+                                        this.state.isProductSelected
+                                    }
+                                    click={this.handleClickSelectItem}
+                                />
+                            </Col>
+                        </Row>
+                    )}
+
                     {this.state.isProductSelected && (
                         <Row>
                             <Col className="my-3">
@@ -251,6 +378,9 @@ export class OrderDetails extends Component {
                                         selectedTotal={this.state.selectedTotal}
                                         isProductSelected={
                                             this.state.isProductSelected
+                                        }
+                                        handleClickCollapsible={
+                                            this.handleClickCollapsible
                                         }
                                     />
                                 </Card>
@@ -285,7 +415,8 @@ export class OrderDetails extends Component {
                                                                 .total
                                                         }
                                                         handleClickSubmit={
-                                                            false
+                                                            this
+                                                                .handleClickSubmitOrder
                                                         }
                                                     />
                                                 </Col>

@@ -10,11 +10,19 @@ export class OrderBar extends Component {
                 <Col sm={6} md={8}>
                     <h2>Total: ${selectedTotal}</h2>
                 </Col>
-                <Col sm={6} md={4}>
+                <Col sm={3} md={2}>
                     <Button onClick={() => this.props.handleClickSubmit()}>
                         Submit
                     </Button>
                 </Col>
+                {this.props.isCollapsible && (
+                    <Col sm={3} md={2}>
+                        <Button
+                            onClick={() => this.props.handleClickCollapsible()}>
+                            Close
+                        </Button>
+                    </Col>
+                )}
             </CSSOrderBar>
         );
     }

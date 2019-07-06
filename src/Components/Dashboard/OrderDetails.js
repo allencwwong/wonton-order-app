@@ -20,8 +20,6 @@ export class OrderDetails extends Component {
                 orderItems = [];
 
             orderItemIds.forEach((id, idx, arr) => {
-                console.log('id', id);
-                console.log('pid', products[id].name.cn);
                 let name = products[id].name.cn,
                     price = products[id].price;
 

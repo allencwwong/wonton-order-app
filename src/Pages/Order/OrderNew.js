@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-
 import {
     ProductOrderPanel,
     OrderDetails,
@@ -158,13 +157,9 @@ export class OrderNew extends Component {
             isProductSelected: false,
             selectedProductList: updatedSelectedProductList,
         });
-
-        console.log('add order:');
-        console.log(this.state.order);
     };
 
     handleClickEditItem = (pid) => {
-        console.log('selected edit');
         this.setState({
             selectedProduct: pid,
             isProductSelected: true,
