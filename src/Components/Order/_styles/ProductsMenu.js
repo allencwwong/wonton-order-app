@@ -8,5 +8,6 @@ export const CSSProductsMenuItem = styled.div`
     }
     .product-icon {
         width: 100%;
+        height: 100%;
     }
 `;
