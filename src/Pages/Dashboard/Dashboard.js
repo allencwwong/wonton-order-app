@@ -2,28 +2,33 @@ import React, { Component } from 'react';
 import { OrderList } from './../../Components/Dashboard';
 import { Header } from './../../Components/Header';
 import { Container, Row, Col } from './../../_styles';
+import { CSSDashboard, CSSDashboardHeader } from './_styles';
 
 export class Dashboard extends Component {
     render() {
         return (
-            <div>
+            <CSSDashboard>
                 <Container fluid={true}>
                     <Container>
                         <Header />
                     </Container>
                 </Container>
                 <Container>
-                    <Row>
-                        <Col xs={6} sm={3}>
-                            <h1>Dashboard</h1>
-                        </Col>
-                        <Col xs={6} sm={9}>
-                            <a href="/createorder" className="btn btn-primary">Add</a>
-                        </Col>
-                    </Row>
+                    <CSSDashboardHeader>
+                        <Row>
+                            <Col>
+                                <h1>Dashboard</h1>
+                                <a
+                                    href="/createorder"
+                                    className="btn btn-primary">
+                                    Add
+                                </a>
+                            </Col>
+                        </Row>
+                    </CSSDashboardHeader>
                     <OrderList />
                 </Container>
-            </div>
+            </CSSDashboard>
         );
     }
 }

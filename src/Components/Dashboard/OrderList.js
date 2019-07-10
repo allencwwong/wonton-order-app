@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { database } from './../../firebase';
 import { OrderInfo, OrderDetails } from './';
 import { Row, Col, Badge } from './../../_styles';
+import { CSSOrderHeading2, CSSOrderListing } from './_styles';
 
 export class OrderList extends Component {
     constructor(props) {
@@ -9,29 +10,44 @@ export class OrderList extends Component {
         this.ordersRef = database.ref('/orders');
         this.state = {
             isOrderLoaded: false,
+            openOrders: 0,
+            cancelledOrders: 0,
         };
     }
 
     createOrderList = (orderList) => {
-        let orderListRender = [];
+        let orderListRender = [],
+            isCompletedOrder = this.state.cancelledOrders > 0,
+            isCompletedOrderHeader = false;
         orderList.forEach((order, idx, arr) => {
+            console.log(order.status);
             if (order.status === 'open') {
                 if (idx === 0) {
                     orderListRender.push(
-                        <h2>
+                        <CSSOrderHeading2 key={idx}>
                             Open Orders
                             <span>
                                 <Badge pill variant="primary">
-                                    {arr.length}
+                                    {this.state.openOrders}
                                 </Badge>
                             </span>
-                        </h2>,
+                        </CSSOrderHeading2>,
                     );
                 }
                 orderListRender.push(order.render);
             } else {
-                if (idx === arr.length - 1) {
-                    orderListRender.push(<h1>Completed Orders</h1>);
+                if (isCompletedOrder && !isCompletedOrderHeader) {
+                    isCompletedOrderHeader = true;
+                    orderListRender.push(
+                        <CSSOrderHeading2 key={idx}>
+                            Completed Orders
+                            <span>
+                                <Badge pill variant="primary">
+                                    {this.state.cancelledOrders}
+                                </Badge>
+                            </span>
+                        </CSSOrderHeading2>,
+                    );
                 }
                 orderListRender.push(order.render);
             }
@@ -52,19 +68,35 @@ export class OrderList extends Component {
                     // set order item status to sort in dashboard
                     orderItem.status = orders[id].status;
                     // create order item render
+
+                    // count open orders
+                    if (orderItem.status === 'open') {
+                        this.setState({
+                            openOrders: (this.state.openOrders += 1),
+                        });
+                    }
+                    // count closed orders
+                    if (orderItem.status === 'cancelled') {
+                        this.setState({
+                            cancelledOrders: (this.state.cancelledOrders += 1),
+                        });
+                    }
+
                     orderItem.render.push(
-                        <Row key={idx}>
+                        <CSSOrderListing key={idx}>
                             <Col sm={12} md={3}>
-                                <OrderInfo oid={id} />
+                                <OrderInfo oid={id} order={orders[id]} />
                             </Col>
                             <Col sm={12} md={8}>
                                 <OrderDetails order={orders[id]} />
                             </Col>
-                        </Row>,
+                        </CSSOrderListing>,
                     );
                     // set order item into order list
                     orderList.push(orderItem);
                 });
+
+                console.log(orderList);
 
                 // pass createOrderDetails is loaded
                 this.setState({
