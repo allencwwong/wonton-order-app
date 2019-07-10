@@ -17,9 +17,11 @@ export class OrderList extends Component {
 
     createOrderList = (orderList) => {
         let orderListRender = [],
+            orderOpenList = [],
+            orderCancelledList = [],
             isCompletedOrder = this.state.cancelledOrders > 0,
             isCompletedOrderHeader = false;
-        orderList.forEach((order, idx, arr) => {
+        orderList.forEach((order, idx) => {
             console.log(order.status);
             if (order.status === 'open') {
                 if (idx === 0) {
@@ -34,7 +36,7 @@ export class OrderList extends Component {
                         </CSSOrderHeading2>,
                     );
                 }
-                orderListRender.push(order.render);
+                orderOpenList.push(order.render);
             } else {
                 if (isCompletedOrder && !isCompletedOrderHeader) {
                     isCompletedOrderHeader = true;
@@ -49,9 +51,10 @@ export class OrderList extends Component {
                         </CSSOrderHeading2>,
                     );
                 }
-                orderListRender.push(order.render);
+                orderCancelledList.push(order.render);
             }
         });
+        orderListRender.push(orderOpenList, orderCancelledList);
         return orderListRender;
     };
 

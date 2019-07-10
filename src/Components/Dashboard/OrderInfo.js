@@ -27,7 +27,7 @@ export class OrderInfo extends Component {
                     <Card.Footer>
                         {this.props.order.status === 'open' && (
                             <Row noGutters>
-                                <CSSOrderInfoBtn sm={6}>
+                                <CSSOrderInfoBtn>
                                     <a
                                         href={'/order/' + this.props.oid}
                                         className="btn btn-primary">

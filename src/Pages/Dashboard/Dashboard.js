@@ -8,11 +8,6 @@ export class Dashboard extends Component {
     render() {
         return (
             <CSSDashboard>
-                <Container fluid={true}>
-                    <Container>
-                        <Header />
-                    </Container>
-                </Container>
                 <Container>
                     <CSSDashboardHeader>
                         <Row>

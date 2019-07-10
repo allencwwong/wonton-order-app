@@ -4,6 +4,7 @@
         "createorder",
         "datepicker",
         "duedate",
+        "fontawesome",
         "orderamount",
         "ordercount"
     ]

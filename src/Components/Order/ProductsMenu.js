@@ -19,11 +19,9 @@ export class ProductsMenu extends Component {
                         data-pid={pid}
                         data-isproductselected={isSelectedProduct}
                         onClick={(e) => this.props.click(e)}>
-                        <Row>isSelected:{isSelectedProduct.toString()}</Row>
                         <Row>
-                            pid:{pid} selectedPid:{selectedProduct}
+                            <img className="product-icon" src={product.icon} />
                         </Row>
-                        <Row>{product.icon}</Row>
                         <Row>{product.name.cn}</Row>
                         <Row>${product.price}</Row>
                     </Card>
