@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import DatePicker from 'react-datepicker';
+import { Print, NoPrint } from 'react-easy-print';
 import 'react-datepicker/dist/react-datepicker.css';
 import {
     ProductOrderPanel,
@@ -27,6 +28,7 @@ export class OrderDetails extends Component {
             selectedQty: 0,
             selectedTotal: 0,
             selectedProductList: {},
+            showSubmit: false,
             buyer: '',
             date: '',
             status: 'open',
@@ -156,6 +158,7 @@ export class OrderDetails extends Component {
             selectedProduct: null,
             isProductSelected: false,
             selectedProductList: updatedSelectedProductList,
+            showSubmit: true,
         });
     };
 
@@ -199,6 +202,7 @@ export class OrderDetails extends Component {
     handleDateChange = (date) => {
         this.setState({
             dueDate: date,
+            showSubmit: true,
         });
     };
 
@@ -221,13 +225,13 @@ export class OrderDetails extends Component {
         console.log(this.state);
         alert('submit edited order');
         let { order, dueDate, buyer, status } = this.state,
-            dbKey;
+            orderIdKey;
 
         dueDate = this.formatDate(dueDate);
-        dbKey = window.location.pathname.split('/')[2];
+        orderIdKey = window.location.pathname.split('/')[2];
 
         database
-            .ref(`/orders/${dbKey}`)
+            .ref(`/orders/${orderIdKey}`)
             .update({
                 buyer: buyer,
                 dueDate: dueDate,
@@ -235,6 +239,19 @@ export class OrderDetails extends Component {
             })
             .then((snapshot) => {
                 window.location.reload();
+            });
+    };
+
+    handleClickCancelOrder = () => {
+        let orderIdKey = window.location.pathname.split('/')[2];
+        // prompt cancel order
+        database
+            .ref(`/orders/${orderIdKey}`)
+            .update({
+                status: 'cancelled',
+            })
+            .then((snapshot) => {
+                this.props.history.push(`/`);
             });
     };
 
@@ -286,6 +303,7 @@ export class OrderDetails extends Component {
 
     render() {
         if (this.state.isProductLoaded) {
+            console.log(this.state.status);
             return (
                 <Container>
                     <Row>
@@ -293,17 +311,14 @@ export class OrderDetails extends Component {
                             <h1>Order Details</h1>
                         </Col>
                     </Row>
-
-                    <Form>
-                        <Row>
-                            <Col xs={12}>
-                                <h1>Order Info</h1>
-                            </Col>
-                            <Col>Id: {this.state.oid}</Col>
-                            <Col>
-                                <Form.Group controlId="orderInfoForm-buyer">
-                                    <Form.Label>buyer</Form.Label>
-                                    {/*
+                    <Print>
+                        <Form>
+                            <Row>
+                                <Col>Id: {this.state.oid}</Col>
+                                <Col>
+                                    <Form.Group controlId="orderInfoForm-buyer">
+                                        <Form.Label>buyer</Form.Label>
+                                        {/*
                                         <Form.Control
                                             type="text"
                                             placeholder="buyer"
@@ -311,34 +326,44 @@ export class OrderDetails extends Component {
                                             onChange={this.handleFormBuyerChange}
                                         />
                                     */}
-                                    {this.state.buyer}
-                                </Form.Group>
+                                        {this.state.buyer}
+                                    </Form.Group>
+                                </Col>
+                                <Col>
+                                    <Form.Group controlId="orderInfoForm-date">
+                                        <Form.Label>Date</Form.Label>
+                                        {this.state.date}
+                                    </Form.Group>
+                                </Col>
+                                <Col>
+                                    <Form.Group controlId="orderInfoForm-duedate">
+                                        <Form.Label>Due Date</Form.Label>
+                                        <DatePicker
+                                            selected={this.state.dueDate}
+                                            onChange={this.handleDateChange}
+                                        />
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                        </Form>
+                    </Print>
+                    {this.state.status !== 'cancelled' && (
+                        <Row>
+                            <Col className="col-1">
+                                <Button
+                                    onClick={this.handleClickShowProductMeu}>
+                                    Add
+                                </Button>
                             </Col>
-                            <Col>
-                                <Form.Group controlId="orderInfoForm-date">
-                                    <Form.Label>Date</Form.Label>
-                                    {this.state.date}
-                                </Form.Group>
-                            </Col>
-                            <Col>
-                                <Form.Group controlId="orderInfoForm-duedate">
-                                    <Form.Label>Due Date</Form.Label>
-                                    <DatePicker
-                                        selected={this.state.dueDate}
-                                        onChange={this.handleDateChange}
-                                    />
-                                </Form.Group>
+                            <Col className="col-1">
+                                <Button
+                                    className="btn-danger"
+                                    onClick={this.handleClickCancelOrder}>
+                                    Cancel
+                                </Button>
                             </Col>
                         </Row>
-                    </Form>
-
-                    <Row>
-                        <Col>
-                            <Button onClick={this.handleClickShowProductMeu}>
-                                Add
-                            </Button>
-                        </Col>
-                    </Row>
+                    )}
 
                     {this.state.showProductMeu && (
                         <Row>
@@ -389,43 +414,50 @@ export class OrderDetails extends Component {
                     )}
 
                     {this.state.order.orderDetails.total > 0 && (
-                        <Row>
-                            <Col sm={12}>
-                                <Card className="mt-3">
-                                    <OrderDetailsBlock
-                                        order={this.state.order}
-                                        products={this.state.products}
-                                        handleClickRemoveOrder={
-                                            this.handleClickRemoveOrder
-                                        }
-                                        handleClickEditItem={
-                                            this.handleClickEditItem
-                                        }
-                                    />
-                                    {this.state.order.orderDetails.total >
-                                        0 && (
-                                        <Card.Footer>
-                                            <Row>
-                                                <Col>
-                                                    <OrderBar
-                                                        bartype="total"
-                                                        selectedTotal={
-                                                            this.state.order
-                                                                .orderDetails
-                                                                .total
-                                                        }
-                                                        handleClickSubmit={
-                                                            this
-                                                                .handleClickSubmitOrder
-                                                        }
-                                                    />
-                                                </Col>
-                                            </Row>
-                                        </Card.Footer>
-                                    )}
-                                </Card>
-                            </Col>
-                        </Row>
+                        <Print>
+                            <Row>
+                                <Col sm={12}>
+                                    <Card className="mt-3">
+                                        <OrderDetailsBlock
+                                            order={this.state.order}
+                                            products={this.state.products}
+                                            handleClickRemoveOrder={
+                                                this.handleClickRemoveOrder
+                                            }
+                                            handleClickEditItem={
+                                                this.handleClickEditItem
+                                            }
+                                            status={this.state.status}
+                                        />
+                                        {this.state.order.orderDetails.total >
+                                            0 && (
+                                            <Card.Footer>
+                                                <Row>
+                                                    <Col>
+                                                        <OrderBar
+                                                            bartype="total"
+                                                            showSubmit={
+                                                                this.state
+                                                                    .showSubmit
+                                                            }
+                                                            selectedTotal={
+                                                                this.state.order
+                                                                    .orderDetails
+                                                                    .total
+                                                            }
+                                                            handleClickSubmit={
+                                                                this
+                                                                    .handleClickSubmitOrder
+                                                            }
+                                                        />
+                                                    </Col>
+                                                </Row>
+                                            </Card.Footer>
+                                        )}
+                                    </Card>
+                                </Col>
+                            </Row>
+                        </Print>
                     )}
                 </Container>
             );

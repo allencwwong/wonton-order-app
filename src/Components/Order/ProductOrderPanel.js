@@ -71,6 +71,7 @@ export class ProductOrderPanel extends Component {
                     </Card.Body>
                     <Card.Footer>
                         <OrderBar
+                            bartype="productTotal"
                             selectedTotal={selectedTotal}
                             handleClickSubmit={this.props.handleClickAddProduct}
                             isCollapsible={true}

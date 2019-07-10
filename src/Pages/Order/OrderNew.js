@@ -263,9 +263,6 @@ export class OrderNew extends Component {
                 <Container>
                     <Form>
                         <Row>
-                            <Col xs={12}>
-                                <h1>Order Info</h1>
-                            </Col>
                             <Col>Id: {this.state.oid + 1}</Col>
                             <Col>
                                 <Form.Group controlId="orderInfoForm-buyer">
@@ -355,7 +352,6 @@ export class OrderNew extends Component {
                                             <Row>
                                                 <Col>
                                                     <OrderBar
-                                                        bartype="total"
                                                         selectedTotal={
                                                             this.state.order
                                                                 .orderDetails
