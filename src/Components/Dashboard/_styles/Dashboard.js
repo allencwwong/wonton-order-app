@@ -26,11 +26,16 @@ export const CSSOrderInfoBtn = styled(Col)`
         float: left;
         border-radius: 0 0 3px 0;
         display: inline-block;
+        font-size: 14px;
+        padding: 0.25rem 0.5rem;
     }
-`;
 
-export const CSSOrderHeading2 = styled.h2`
-    padding: 0;
+    @media (min-width: 992px) {
+        a {
+            font-size: 16px;
+            padding: 0.375rem 0.75rem;
+        }
+    }
 `;
 
 export const CSSOrderListing = styled(Row)`

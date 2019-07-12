@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { database } from './../../firebase';
 import { OrderInfo, OrderDetails } from './';
 import { Row, Col, Badge } from './../../_styles';
-import { CSSOrderHeading2, CSSOrderListing } from './_styles';
+import { CSSOrderListing } from './_styles';
 
 export class OrderList extends Component {
     constructor(props) {
@@ -15,46 +15,15 @@ export class OrderList extends Component {
         };
     }
 
-    createOrderList = (orderList) => {
-        let orderListRender = [],
-            orderOpenList = [],
-            orderCancelledList = [],
-            isCompletedOrder = this.state.cancelledOrders > 0,
-            isCompletedOrderHeader = false;
-        orderList.forEach((order, idx) => {
+    createOrderList = (orderList, status) => {
+        let orderListRender = [];
+
+        orderList.forEach((order) => {
             console.log(order.status);
-            if (order.status === 'open') {
-                if (idx === 0) {
-                    orderListRender.push(
-                        <CSSOrderHeading2 key={idx}>
-                            Open Orders
-                            <span>
-                                <Badge pill variant="primary">
-                                    {this.state.openOrders}
-                                </Badge>
-                            </span>
-                        </CSSOrderHeading2>,
-                    );
-                }
-                orderOpenList.push(order.render);
-            } else {
-                if (isCompletedOrder && !isCompletedOrderHeader) {
-                    isCompletedOrderHeader = true;
-                    orderListRender.push(
-                        <CSSOrderHeading2 key={idx}>
-                            Completed Orders
-                            <span>
-                                <Badge pill variant="primary">
-                                    {this.state.cancelledOrders}
-                                </Badge>
-                            </span>
-                        </CSSOrderHeading2>,
-                    );
-                }
-                orderCancelledList.push(order.render);
+            if (order.status === status) {
+                orderListRender.push(order.render);
             }
         });
-        orderListRender.push(orderOpenList, orderCancelledList);
         return orderListRender;
     };
 
@@ -116,7 +85,14 @@ export class OrderList extends Component {
 
     render() {
         if (this.state.isOrderLoaded) {
-            return <div>{this.createOrderList(this.state.orderList)}</div>;
+            return (
+                <div>
+                    {this.createOrderList(
+                        this.state.orderList,
+                        this.props.status,
+                    )}
+                </div>
+            );
         } else if (!this.state.isOrder) {
             return <div>No Data...</div>;
         } else {

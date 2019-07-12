@@ -11,7 +11,7 @@ export class Header extends Component {
                         <Badge variant="secondary">
                             <p>
                                 <i className="far fa-chevron-left" />
-                                Arrows Back to Dashboard
+                                Back to Dashboard
                             </p>
                         </Badge>
                     </CSSBackToDash>

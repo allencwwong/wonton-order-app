@@ -15,8 +15,12 @@ export class OrderInfo extends Component {
                             </ListGroup.Item>
                             <ListGroup.Item>
                                 <Row>
-                                    <Col xs={4}>Id: {order.oid}</Col>
-                                    <Col xs={6}>Buyer: {order.buyer}</Col>
+                                    <Col md={12} lg={4}>
+                                        Id: {order.oid}
+                                    </Col>
+                                    <Col md={12} lg={8}>
+                                        Buyer: {order.buyer}
+                                    </Col>
                                 </Row>
                             </ListGroup.Item>
                             <ListGroup.Item>
@@ -36,7 +40,7 @@ export class OrderInfo extends Component {
                                     <a
                                         href={'/order/' + this.props.oid}
                                         className="btn btn-danger">
-                                        remove
+                                        Remove
                                     </a>
                                 </CSSOrderInfoBtn>
                             </Row>
