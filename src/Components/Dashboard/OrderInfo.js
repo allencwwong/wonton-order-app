@@ -37,9 +37,7 @@ export class OrderInfo extends Component {
                                         className="btn btn-primary">
                                         Edit
                                     </a>
-                                    <a
-                                        href={'/order/' + this.props.oid}
-                                        className="btn btn-danger">
+                                    <a href="#" className="btn btn-danger">
                                         Remove
                                     </a>
                                 </CSSOrderInfoBtn>

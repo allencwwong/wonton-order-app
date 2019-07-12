@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { database } from './../../firebase';
 import { OrderList } from './../../Components/Dashboard';
+import { Remove } from './../../Components/Confirmation';
 import { Container, Row, Col, Badge } from './../../_styles';
 import { CSSDashboard, CSSDashboardHeader, CSSOrderHeading2 } from './_styles';
 
@@ -10,10 +11,17 @@ export class Dashboard extends Component {
         this.ordersRef = database.ref('/orders');
         this.state = {
             isOrderLoaded: false,
+            showRemoveWarning: false,
             openOrders: 0,
             cancelledOrders: 0,
         };
     }
+
+    handleClickRemoveWarning = () => {
+        this.setState({
+            showRemoveWarning: true,
+        });
+    };
 
     componentDidMount() {
         this.ordersRef.on('value', (snapshot) => {
@@ -50,6 +58,7 @@ export class Dashboard extends Component {
     render() {
         return (
             <CSSDashboard>
+                <Remove />
                 <Container>
                     <CSSDashboardHeader>
                         <Row>
