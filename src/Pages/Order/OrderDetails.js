@@ -10,7 +10,7 @@ import {
 } from './../../Components/Order';
 import { Container, Row, Col, Card, Form, Button } from './../../_styles';
 import { database } from './../../firebase';
-import { Header } from './../../Components';
+import { Header } from './../../Components/Header';
 
 export class OrderDetails extends Component {
     constructor(props) {

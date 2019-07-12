@@ -9,7 +9,7 @@ import {
 } from './../../Components/Order';
 import { Container, Row, Col, Card, Form } from './../../_styles';
 import { database } from './../../firebase';
-import { Header } from './../../Components';
+import { Header } from './../../Components/Header';
 
 export class OrderNew extends Component {
     // load products
