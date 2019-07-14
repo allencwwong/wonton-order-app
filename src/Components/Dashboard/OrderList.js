@@ -19,7 +19,6 @@ export class OrderList extends Component {
         let orderListRender = [];
 
         orderList.forEach((order) => {
-            console.log(order.status);
             if (order.status === status) {
                 orderListRender.push(order.render);
             }
@@ -57,7 +56,13 @@ export class OrderList extends Component {
                     orderItem.render.push(
                         <CSSOrderListing key={idx}>
                             <Col sm={12} md={3}>
-                                <OrderInfo oid={id} order={orders[id]} />
+                                <OrderInfo
+                                    oid={id}
+                                    order={orders[id]}
+                                    handleClickRemoveWarning={
+                                        this.props.handleClickRemoveWarning
+                                    }
+                                />
                             </Col>
                             <Col sm={12} md={8}>
                                 <OrderDetails order={orders[id]} />
@@ -67,8 +72,6 @@ export class OrderList extends Component {
                     // set order item into order list
                     orderList.push(orderItem);
                 });
-
-                console.log(orderList);
 
                 // pass createOrderDetails is loaded
                 this.setState({

@@ -14,20 +14,49 @@ export class Dashboard extends Component {
             showRemoveWarning: false,
             openOrders: 0,
             cancelledOrders: 0,
+            oid: null,
         };
     }
 
-    handleClickRemoveWarning = () => {
+    handleClickRemoveWarning = (oid) => {
         this.setState({
             showRemoveWarning: true,
+            oid: oid,
         });
+    };
+
+    handleClickRemoveWarningClose = (oid) => {
+        this.setState({
+            showRemoveWarning: false,
+        });
+    };
+
+    handleClickRemoveOrder = () => {
+        console.log('removed order');
+        // remove order for db
+        // let openOrders = this.state.openOrders - 1,
+        //     cancelledOrders = this.state.cancelledOrders + 1;
+        this.setState({
+            showRemoveWarning: false,
+            oid: null,
+        });
+        database.ref(`/orders/${this.state.oid}`).update({
+            status: 'cancelled',
+        });
+        // console.log(openOrders);
+        // console.log(cancelledOrders);
+
+        console.log(this.state.openOrders);
+        console.log(this.state.cancelledOrders);
     };
 
     componentDidMount() {
         this.ordersRef.on('value', (snapshot) => {
             if (snapshot.exists()) {
                 let orders = snapshot.val(),
-                    orderIds = Object.keys(orders);
+                    orderIds = Object.keys(orders),
+                    openOrders = 0,
+                    cancelledOrders = 0;
 
                 orderIds.forEach((id, idx) => {
                     // set order item status to sort in dashboard
@@ -36,13 +65,13 @@ export class Dashboard extends Component {
                     // count open orders
                     if (orderStatus === 'open') {
                         this.setState({
-                            openOrders: (this.state.openOrders += 1),
+                            openOrders: (openOrders += 1),
                         });
                     }
                     // count closed orders
                     if (orderStatus === 'cancelled') {
                         this.setState({
-                            cancelledOrders: (this.state.cancelledOrders += 1),
+                            cancelledOrders: (cancelledOrders += 1),
                         });
                     }
 
@@ -51,6 +80,19 @@ export class Dashboard extends Component {
                         isOrderLoaded: true,
                     });
                 });
+                if (openOrders === 0) {
+                    this.setState({
+                        openOrders: 0,
+                    });
+                }
+                if (cancelledOrders === 0) {
+                    this.setState({
+                        cancelledOrders: 0,
+                    });
+                }
+                this.setState({
+                    orders: orders,
+                });
             }
         });
     }
@@ -58,7 +100,16 @@ export class Dashboard extends Component {
     render() {
         return (
             <CSSDashboard>
-                <Remove />
+                {this.state.showRemoveWarning && (
+                    <Remove
+                        handleClickRemoveWarningClose={
+                            this.handleClickRemoveWarningClose
+                        }
+                        handleClickRemoveOrder={this.handleClickRemoveOrder}
+                        oid={this.state.oid}
+                        order={this.state.orders[this.state.oid]}
+                    />
+                )}
                 <Container>
                     <CSSDashboardHeader>
                         <Row>
@@ -78,14 +129,20 @@ export class Dashboard extends Component {
                             {this.state.openOrders}
                         </Badge>
                     </CSSOrderHeading2>
-                    <OrderList status="open" />
+                    <OrderList
+                        status="open"
+                        handleClickRemoveWarning={this.handleClickRemoveWarning}
+                    />
                     <CSSOrderHeading2>
                         Completed Orders
                         <Badge pill variant="primary">
                             {this.state.cancelledOrders}
                         </Badge>
                     </CSSOrderHeading2>
-                    <OrderList status="cancelled" />
+                    <OrderList
+                        status="cancelled"
+                        handleClickRemoveWarning={this.handleClickRemoveWarning}
+                    />
                 </Container>
             </CSSDashboard>
         );

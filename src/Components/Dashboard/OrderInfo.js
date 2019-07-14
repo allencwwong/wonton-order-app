@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Row, Col, Card, ListGroup } from './../../_styles';
 import { CSSOrderInfoBtn, CSSOrderInfoCard } from './_styles';
+import { OrderDetails } from '../../Components/Dashboard/OrderDetails';
 
 export class OrderInfo extends Component {
     render() {
@@ -37,7 +38,14 @@ export class OrderInfo extends Component {
                                         className="btn btn-primary">
                                         Edit
                                     </a>
-                                    <a href="#" className="btn btn-danger">
+                                    <a
+                                        href="#"
+                                        className="btn btn-danger"
+                                        onClick={() =>
+                                            this.props.handleClickRemoveWarning(
+                                                this.props.oid,
+                                            )
+                                        }>
                                         Remove
                                     </a>
                                 </CSSOrderInfoBtn>
