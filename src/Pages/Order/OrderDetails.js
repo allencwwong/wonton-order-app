@@ -11,6 +11,7 @@ import {
 import { Container, Row, Col, Card, Form, Button } from './../../_styles';
 import { database } from './../../firebase';
 import { Header } from './../../Components/Header';
+import { CSSOrderDetails } from './_styles';
 
 export class OrderDetails extends Component {
     constructor(props) {
@@ -306,7 +307,7 @@ export class OrderDetails extends Component {
         if (this.state.isProductLoaded) {
             console.log(this.state.status);
             return (
-                <div>
+                <CSSOrderDetails>
                     <Container fluid={true}>
                         <Container>
                             <Header />
@@ -321,35 +322,47 @@ export class OrderDetails extends Component {
                         <Print>
                             <Form>
                                 <Row>
-                                    <Col>Id: {this.state.oid}</Col>
-                                    <Col>
-                                        <Form.Group controlId="orderInfoForm-buyer">
-                                            <Form.Label>buyer</Form.Label>
-                                            {/*
-                                        <Form.Control
-                                            type="text"
-                                            placeholder="buyer"
-                                            selected={this.state.buyer}
-                                            onChange={this.handleFormBuyerChange}
-                                        />
-                                    */}
-                                            {this.state.buyer}
-                                        </Form.Group>
+                                    <Col xs={6} sm={3}>
+                                        <Card className="order-info-card">
+                                            <Card.Header>Id</Card.Header>
+                                            <Card.Body>
+                                                {this.state.oid}
+                                            </Card.Body>
+                                        </Card>
                                     </Col>
-                                    <Col>
-                                        <Form.Group controlId="orderInfoForm-date">
-                                            <Form.Label>Date</Form.Label>
-                                            {this.state.date}
-                                        </Form.Group>
+                                    <Col xs={6} sm={3}>
+                                        <Card className="order-info-card">
+                                            <Card.Header>Buyer</Card.Header>
+                                            <Card.Body>
+                                                {this.state.buyer}
+                                            </Card.Body>
+                                        </Card>
                                     </Col>
-                                    <Col>
-                                        <Form.Group controlId="orderInfoForm-duedate">
-                                            <Form.Label>Due Date</Form.Label>
-                                            <DatePicker
-                                                selected={this.state.dueDate}
-                                                onChange={this.handleDateChange}
-                                            />
-                                        </Form.Group>
+                                    <Col xs={6} sm={3}>
+                                        <Card className="order-info-card">
+                                            <Card.Header>Date</Card.Header>
+                                            <Card.Body>
+                                                {this.state.date}
+                                            </Card.Body>
+                                        </Card>
+                                    </Col>
+                                    <Col xs={6} sm={3}>
+                                        <Card className="order-info-card">
+                                            <Card.Header>Due Date</Card.Header>
+                                            <Card.Body>
+                                                <Form.Group controlId="orderInfoForm-duedate">
+                                                    <DatePicker
+                                                        selected={
+                                                            this.state.dueDate
+                                                        }
+                                                        onChange={
+                                                            this
+                                                                .handleDateChange
+                                                        }
+                                                    />
+                                                </Form.Group>
+                                            </Card.Body>
+                                        </Card>
                                     </Col>
                                 </Row>
                             </Form>
@@ -479,7 +492,7 @@ export class OrderDetails extends Component {
                             </Print>
                         )}
                     </Container>
-                </div>
+                </CSSOrderDetails>
             );
         } else if (this.state.isLoadingOrder) {
             return <div>Loading...</div>;
