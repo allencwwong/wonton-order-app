@@ -356,19 +356,12 @@ export class OrderDetails extends Component {
                         </Print>
                         {this.state.status !== 'cancelled' && (
                             <Row>
-                                <Col className="col-1">
+                                <Col>
                                     <Button
                                         onClick={
                                             this.handleClickShowProductMeu
                                         }>
                                         Add
-                                    </Button>
-                                </Col>
-                                <Col className="col-1">
-                                    <Button
-                                        className="btn-danger"
-                                        onClick={this.handleClickCancelOrder}>
-                                        Cancel
                                     </Button>
                                 </Col>
                             </Row>
@@ -469,6 +462,18 @@ export class OrderDetails extends Component {
                                                 </Card.Footer>
                                             )}
                                         </Card>
+                                        <Row>
+                                            <Col xs={4} md={1}>
+                                                <Button
+                                                    className="btn-danger"
+                                                    onClick={
+                                                        this
+                                                            .handleClickCancelOrder
+                                                    }>
+                                                    Cancel
+                                                </Button>
+                                            </Col>
+                                        </Row>
                                     </Col>
                                 </Row>
                             </Print>
