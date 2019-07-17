@@ -14,32 +14,34 @@ export class OrderDetails extends Component {
         const { order, products } = this.state;
         let orderItemIds,
             orderDetails,
-            orderList = [];
+            orderList = [],
+            orderDetailsPanelHeader = [];
+        orderDetailsPanelHeader.push(
+            <Card.Header>
+                <Row>
+                    <Col xs={3} md={3}>
+                        Item
+                    </Col>
+                    <Col xs={2} md={2}>
+                        Qty
+                    </Col>
+                    <Col xs={3} md={2}>
+                        Price
+                    </Col>
+                    <Col xs={3} md={2}>
+                        Total
+                    </Col>
+                </Row>
+            </Card.Header>,
+        );
+        orderList.push(orderDetailsPanelHeader);
 
         orderItemIds = Object.keys(order.orderDetails.products);
         orderItemIds.forEach((id) => {
-            let orderDetailsPanel = [];
-            orderDetailsPanel.push(
-                <Card.Header>
-                    <Row>
-                        <Col xs={3} md={3}>
-                            Item
-                        </Col>
-                        <Col xs={2} md={2}>
-                            Qty
-                        </Col>
-                        <Col xs={3} md={2}>
-                            Price
-                        </Col>
-                        <Col xs={3} md={2}>
-                            Total
-                        </Col>
-                    </Row>
-                </Card.Header>,
-            );
+            let orderDetailsPanelBody = [];
             if (order.orderDetails.products[id].qty > 0) {
                 orderDetails = order.orderDetails.products[id];
-                orderDetailsPanel.push(
+                orderDetailsPanelBody.push(
                     <Card.Body key={id}>
                         <Row>
                             <Col xs={3} md={3}>
@@ -84,7 +86,7 @@ export class OrderDetails extends Component {
                     </Card.Body>
                 );
                 if (this.props.status !== 'cancelled') {
-                    orderList.push(orderDetailsPanel);
+                    orderList.push(orderDetailsPanelBody);
                 } else {
                     orderList.push(orderDetailsPanelCancelled);
                 }
