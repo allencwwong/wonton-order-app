@@ -271,7 +271,7 @@ export class OrderNew extends Component {
                                 <Col>Id: {this.state.oid + 1}</Col>
                                 <Col>
                                     <Form.Group controlId="orderInfoForm-buyer">
-                                        <Form.Label>buyer</Form.Label>
+                                        <Form.Label>买主</Form.Label>
                                         <Form.Control
                                             type="text"
                                             placeholder="buyer"
@@ -283,13 +283,13 @@ export class OrderNew extends Component {
                                 </Col>
                                 <Col>
                                     <Form.Group controlId="orderInfoForm-date">
-                                        <Form.Label>Date</Form.Label>
+                                        <Form.Label>订购日期</Form.Label>
                                         {this.formatDate(new Date())}
                                     </Form.Group>
                                 </Col>
                                 <Col>
                                     <Form.Group controlId="orderInfoForm-duedate">
-                                        <Form.Label>Due Date</Form.Label>
+                                        <Form.Label>交货日期</Form.Label>
                                         <DatePicker
                                             selected={this.state.dueDate}
                                             onChange={this.handleDateChange}

@@ -359,7 +359,7 @@ export class OrderDetails extends Component {
                                     </Col>
                                     <Col xs={6} sm={3}>
                                         <Card className="order-info-card">
-                                            <Card.Header>Due Date</Card.Header>
+                                            <Card.Header>交货日期</Card.Header>
                                             <Card.Body>
                                                 <Form.Group controlId="orderInfoForm-duedate">
                                                     <DatePicker

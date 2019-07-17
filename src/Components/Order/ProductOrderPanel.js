@@ -28,7 +28,6 @@ export class ProductOrderPanel extends Component {
                             <Col sm={12} md={4}>
                                 <h1>{currProduct.name}</h1>
                                 <h2>Id: {selectedProduct}</h2>
-                                <h2>{currProduct.icon}</h2>
                                 <h2>${currProduct.price}</h2>
                             </Col>
                             <Col sm={12} md={8}>

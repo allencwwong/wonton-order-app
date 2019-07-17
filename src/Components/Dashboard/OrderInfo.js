@@ -12,7 +12,7 @@ export class OrderInfo extends Component {
                     <Card.Body>
                         <ListGroup variant="flush">
                             <ListGroup.Item>
-                                Order date: {order.date}
+                                交货日期: {order.date}
                             </ListGroup.Item>
                             <ListGroup.Item>
                                 <Row>
@@ -25,7 +25,7 @@ export class OrderInfo extends Component {
                                 </Row>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                Due date: {order.dueDate}
+                                交货日期: {order.dueDate}
                             </ListGroup.Item>
                         </ListGroup>
                     </Card.Body>

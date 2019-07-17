@@ -129,7 +129,7 @@ export class Dashboard extends Component {
                                 <a
                                     href="/createorder"
                                     className="btn btn-primary">
-                                    Add
+                                    新订单
                                 </a>
                             </Col>
                         </Row>
