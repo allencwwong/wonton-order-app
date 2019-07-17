@@ -20,7 +20,10 @@ export class ProductsMenu extends Component {
                         data-isproductselected={isSelectedProduct}
                         onClick={(e) => this.props.click(e)}>
                         <Row>
-                            <img className="product-icon" src={product.icon} />
+                            <img
+                                className="product-icon"
+                                src={`/${product.icon}`}
+                            />
                         </Row>
                         <Row>{product.name.cn}</Row>
                         <Row>${product.price}</Row>

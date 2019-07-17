@@ -27,9 +27,9 @@ export class OrderDetails extends Component {
                     orderItems.push(
                         <tr key={idx}>
                             <td>{name}</td>
-                            <td>{price}</td>
+                            <td>${price}</td>
                             <td>{orderDetails.products[id].qty}</td>
-                            <td>{orderDetails.products[id].total}</td>
+                            <td>${orderDetails.products[id].selectedTotal}</td>
                         </tr>,
                     );
                 }

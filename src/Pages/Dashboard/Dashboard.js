@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { database } from './../../firebase';
 import { OrderList } from './../../Components/Dashboard';
 import { Remove } from './../../Components/Confirmation';
-import { Container, Row, Col, Badge } from './../../_styles';
+import { Container, Row, Col, Badge, Card } from './../../_styles';
 import { CSSDashboard, CSSDashboardHeader, CSSOrderHeading2 } from './_styles';
 
 export class Dashboard extends Component {
@@ -56,7 +56,8 @@ export class Dashboard extends Component {
                 let orders = snapshot.val(),
                     orderIds = Object.keys(orders),
                     openOrders = 0,
-                    cancelledOrders = 0;
+                    cancelledOrders = 0,
+                    completedOrders = 0;
 
                 orderIds.forEach((id, idx) => {
                     // set order item status to sort in dashboard
@@ -66,6 +67,11 @@ export class Dashboard extends Component {
                     if (orderStatus === 'open') {
                         this.setState({
                             openOrders: (openOrders += 1),
+                        });
+                    }
+                    if (orderStatus === 'completed') {
+                        this.setState({
+                            completedOrders: (completedOrders += 1),
                         });
                     }
                     // count closed orders
@@ -83,6 +89,11 @@ export class Dashboard extends Component {
                 if (openOrders === 0) {
                     this.setState({
                         openOrders: 0,
+                    });
+                }
+                if (completedOrders === 0) {
+                    this.setState({
+                        completedOrders: 0,
                     });
                 }
                 if (cancelledOrders === 0) {
@@ -114,7 +125,7 @@ export class Dashboard extends Component {
                     <CSSDashboardHeader>
                         <Row>
                             <Col>
-                                <h1>Dashboard</h1>
+                                <h1>仪表板</h1>
                                 <a
                                     href="/createorder"
                                     className="btn btn-primary">
@@ -124,7 +135,7 @@ export class Dashboard extends Component {
                         </Row>
                     </CSSDashboardHeader>
                     <CSSOrderHeading2>
-                        Open Orders
+                        未结订单
                         <Badge pill variant="primary">
                             {this.state.openOrders}
                         </Badge>
@@ -134,7 +145,24 @@ export class Dashboard extends Component {
                         handleClickRemoveWarning={this.handleClickRemoveWarning}
                     />
                     <CSSOrderHeading2>
-                        Completed Orders
+                        完成订单
+                        <Badge pill variant="primary">
+                            {this.state.completedOrders}
+                        </Badge>
+                    </CSSOrderHeading2>
+                    {this.state.completedOrders === 0 ? (
+                        <Card body>没有数据</Card>
+                    ) : (
+                        <OrderList
+                            status="completed"
+                            handleClickRemoveWarning={
+                                this.handleClickRemoveWarning
+                            }
+                        />
+                    )}
+
+                    <CSSOrderHeading2>
+                        取消订单
                         <Badge pill variant="primary">
                             {this.state.cancelledOrders}
                         </Badge>

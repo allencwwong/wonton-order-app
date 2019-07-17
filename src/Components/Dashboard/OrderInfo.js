@@ -20,7 +20,7 @@ export class OrderInfo extends Component {
                                         Id: {order.oid}
                                     </Col>
                                     <Col md={12} lg={8}>
-                                        Buyer: {order.buyer}
+                                        买主: {order.buyer}
                                     </Col>
                                 </Row>
                             </ListGroup.Item>
@@ -36,7 +36,7 @@ export class OrderInfo extends Component {
                                     <a
                                         href={'/order/' + this.props.oid}
                                         className="btn btn-primary">
-                                        Edit
+                                        编辑
                                     </a>
                                     <a
                                         href="#"
@@ -46,7 +46,7 @@ export class OrderInfo extends Component {
                                                 this.props.oid,
                                             )
                                         }>
-                                        Remove
+                                        消除
                                     </a>
                                 </CSSOrderInfoBtn>
                             </Row>

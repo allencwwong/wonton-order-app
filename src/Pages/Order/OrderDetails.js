@@ -224,8 +224,6 @@ export class OrderDetails extends Component {
 
     // submit order to fb (update)
     handleClickSubmitOrder = () => {
-        console.log(this.state);
-        alert('submit edited order');
         let { order, dueDate, buyer, status } = this.state,
             orderIdKey;
 
@@ -251,6 +249,19 @@ export class OrderDetails extends Component {
             .ref(`/orders/${orderIdKey}`)
             .update({
                 status: 'cancelled',
+            })
+            .then((snapshot) => {
+                this.props.history.push(`/`);
+            });
+    };
+
+    handleClickCompletedOrder = () => {
+        let orderIdKey = window.location.pathname.split('/')[2];
+        // prompt cancel order
+        database
+            .ref(`/orders/${orderIdKey}`)
+            .update({
+                status: 'completed',
             })
             .then((snapshot) => {
                 this.props.history.push(`/`);
@@ -484,6 +495,16 @@ export class OrderDetails extends Component {
                                                             .handleClickCancelOrder
                                                     }>
                                                     Cancel
+                                                </Button>
+                                            </Col>
+                                            <Col xs={4} md={1}>
+                                                <Button
+                                                    className="btn-success"
+                                                    onClick={
+                                                        this
+                                                            .handleClickCompletedOrder
+                                                    }>
+                                                    Completed
                                                 </Button>
                                             </Col>
                                         </Row>

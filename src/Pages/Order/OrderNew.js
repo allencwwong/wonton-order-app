@@ -191,8 +191,6 @@ export class OrderNew extends Component {
 
     // submit order to fb
     handleClickSubmitOrder = () => {
-        console.log(this.state);
-        alert('submit order');
         let { order, oid, date, dueDate, buyer, status } = this.state;
         oid += 1;
         date = this.formatDate(date);
