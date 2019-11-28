@@ -87,7 +87,7 @@ export class OrderList extends Component {
     }
 
     render() {
-        if (this.state.isOrderLoaded) {
+        if (this.state.isOrderLoaded && this.props.isShow) {
             return (
                 <div>
                     {this.createOrderList(
@@ -96,9 +96,13 @@ export class OrderList extends Component {
                     )}
                 </div>
             );
-        } else if (!this.state.isOrder) {
+        }else if( !this.props.isShow ){
+            return <a href="#" onClick={ (e)=> this.props.handleClickViewMore(e) } data-vm-id="completed">查看更多</a>
+        }  
+        else if (!this.state.isOrder) {
             return <div>No Data...</div>;
-        } else {
+        } 
+        else {
             return <div>Loading...</div>;
         }
     }

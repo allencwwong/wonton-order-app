@@ -2,6 +2,12 @@ import React, { Component } from 'react';
 import { database } from './../../firebase';
 import { Row, Col, Table } from './../../_styles';
 
+const CSSTotal = {
+    backgroundColor: 'green',
+    fontWeight: '600',
+    color: '#fff'
+}
+
 export class OrderDetails extends Component {
     constructor(props) {
         super(props);
@@ -17,13 +23,15 @@ export class OrderDetails extends Component {
 
             let products = snapshot.val(),
                 orderItemIds = Object.keys(orderDetails.products),
-                orderItems = [];
+                orderItems = [],
+                totalAmount = 0;
 
             orderItemIds.forEach((id, idx, arr) => {
                 let name = products[id].name.cn,
                     price = products[id].price;
 
                 if (orderDetails.products[id].qty > 0) {
+                    totalAmount+= orderDetails.products[id].selectedTotal
                     orderItems.push(
                         <tr key={idx}>
                             <td>{name}</td>
@@ -35,6 +43,8 @@ export class OrderDetails extends Component {
                 }
             });
 
+            orderItems.push(<tr style={CSSTotal}><td colSpan="4">共計: ${totalAmount}</td></tr>);
+
             this.setState({
                 isProductLoaded: true,
                 orderItems: orderItems,
@@ -43,7 +53,6 @@ export class OrderDetails extends Component {
     }
 
     render() {
-        const { order } = this.props.order;
         if (this.state.isProductLoaded) {
             return (
                 <Table className="order-details" responsive hover size="sm">

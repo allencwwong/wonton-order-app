@@ -15,6 +15,7 @@ export class Dashboard extends Component {
             openOrders: 0,
             cancelledOrders: 0,
             oid: null,
+            isShowCompleted: false,
         };
     }
 
@@ -49,6 +50,13 @@ export class Dashboard extends Component {
         console.log(this.state.openOrders);
         console.log(this.state.cancelledOrders);
     };
+    
+    handleClickViewMore = (e) =>{
+        console.log(e.target.getAttribute('data-vm-id'));
+        this.setState({
+            isShowCompleted: !this.state.isShowCompleted,
+        })
+    }
 
     componentDidMount() {
         this.ordersRef.on('value', (snapshot) => {
@@ -143,6 +151,7 @@ export class Dashboard extends Component {
                     <OrderList
                         status="open"
                         handleClickRemoveWarning={this.handleClickRemoveWarning}
+                        isShow={ true }
                     />
                     <CSSOrderHeading2>
                         完成订单
@@ -158,19 +167,22 @@ export class Dashboard extends Component {
                             handleClickRemoveWarning={
                                 this.handleClickRemoveWarning
                             }
+                            isShow={ this.state.isShowCompleted }
+                            handleClickViewMore={ this.handleClickViewMore }
                         />
                     )}
-
-                    <CSSOrderHeading2>
-                        取消订单
-                        <Badge pill variant="primary">
-                            {this.state.cancelledOrders}
-                        </Badge>
-                    </CSSOrderHeading2>
-                    <OrderList
-                        status="cancelled"
-                        handleClickRemoveWarning={this.handleClickRemoveWarning}
-                    />
+                    {/*                     
+                        <CSSOrderHeading2>
+                            取消订单
+                            <Badge pill variant="primary">
+                                {this.state.cancelledOrders}
+                            </Badge>
+                        </CSSOrderHeading2>
+                        <OrderList
+                            status="cancelled"
+                            handleClickRemoveWarning={this.handleClickRemoveWarning}
+                        />
+                    */}
                 </Container>
             </CSSDashboard>
         );
