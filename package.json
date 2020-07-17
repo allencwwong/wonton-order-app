@@ -7,7 +7,7 @@
     "firebase": "^6.0.2",
     "install": "^0.12.2",
     "jquery": "^3.4.1",
-    "lodash": "^4.17.14",
+    "lodash": "^4.17.19",
     "npm": "^6.10.1",
     "react": "^16.8.6",
     "react-bootstrap": "^1.0.0-beta.8",
