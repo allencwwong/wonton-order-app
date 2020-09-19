@@ -52,6 +52,9 @@ export class OrderNew extends Component {
                         dce: {
                             qty: 0,
                         },
+                        swt: {
+                            qty: 0,
+                        },
                     },
                 },
             },
